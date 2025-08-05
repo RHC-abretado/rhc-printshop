@@ -5,8 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'assets/database.php';
 
 // ─── Cloudflare Turnstile keys ────────────────────────────
-const TURNSTILE_SITEKEY   = '0x4AAAAAABTq_ONo-n-WmTXx';
-const TURNSTILE_SECRETKEY = '0x4AAAAAABTq_Nu_8P75bfRW3vmrBBDDoyQ';
+$turnstileSiteKey = getenv('TURNSTILE_SITEKEY')
+    ?: $_ENV['TURNSTILE_SITEKEY'] ?? $_SERVER['TURNSTILE_SITEKEY'] ?? '';
+$turnstileSecretKey = getenv('TURNSTILE_SECRET')
+    ?: $_ENV['TURNSTILE_SECRET'] ?? $_SERVER['TURNSTILE_SECRET'] ?? '';
 // ──────────────────────────────────────────────────────────
 
 
@@ -158,7 +160,7 @@ require_once 'header.php';
           <input class="form-check-input" type="checkbox" name="remember" id="remember">
           <label class="form-check-label" for="remember">Remember Me</label>
         </div>
-        <div class="cf-turnstile mb-3" data-sitekey="<?= TURNSTILE_SITEKEY ?>"></div>
+        <div class="cf-turnstile mb-3" data-sitekey="<?= htmlspecialchars($turnstileSiteKey) ?>"></div>
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-primary">Login</button>
           <a href="forgot_password.php" class="btn btn-link">Forgot Password?</a>
@@ -169,3 +171,4 @@ require_once 'header.php';
 </div>
 
 <?php require_once 'footer.php'; ?>
+
