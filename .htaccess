@@ -1,0 +1,117 @@
+# Ensure auth.php runs before any other PHP in this folder
+<IfModule mod_php7.c>
+    php_value auto_prepend_file "auth.php"
+</IfModule>
+<IfModule mod_php.c>
+    php_value auto_prepend_file "auth.php"
+</IfModule>
+#timezone
+<IfModule mod_php7.c>
+  php_value date.timezone "America/Los_Angeles"
+</IfModule>
+<IfModule mod_php.c>
+  php_value date.timezone "America/Los_Angeles"
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (adjust as needed)
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-src https://challenges.cloudflare.com"
+    
+    # Remove server signature
+    Header always unset Server
+    Header always unset X-Powered-By
+</IfModule>
+
+# Hide sensitive files
+<FilesMatch "\.(env|log|sql|bak|backup|config|ini)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protect specific directories
+<Directory "assets/">
+    Options -Indexes
+    <FilesMatch "\.php$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+</Directory>
+
+<Directory "helpers/">
+    Options -Indexes
+    <FilesMatch "\.php$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+</Directory>
+
+<Directory "libs/">
+    Options -Indexes
+    Order Allow,Deny
+    Deny from all
+</Directory>
+
+# Protect uploads directory - allow only specific file types
+<Directory "uploads/">
+    Options -Indexes -ExecCGI
+    AddHandler cgi-script .php .pl .py .jsp .asp .sh .cgi
+    php_flag engine off
+    
+    # Only allow safe file extensions
+    <FilesMatch "\.(?!(doc|docx|pdf|png|jpg|jpeg)$)[^.]+$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+    
+    # Prevent execution of any scripts
+    <FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|jsp|asp|sh|cgi)$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Disable directory browsing
+Options -Indexes
+
+# Enable mod_rewrite
+RewriteEngine On
+
+# Force HTTPS - redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirect www to non-www (optional)
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+# Block common attack patterns
+RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} ^.*(\[|\]|\(|\)|<|>|ê|"|;|\?|\*|=.*[<>'"]).* [NC,OR]
+RewriteCond %{QUERY_STRING} ^.*("|'|<|>|\|).* [NC,OR]
+RewriteCond %{QUERY_STRING} ^.*(%0|%A|%B|%C|%D|%E|%F).* [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+# Block suspicious user agents
+RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+RewriteCond %{HTTP_USER_AGENT} ^(-|\.|') [OR]
+RewriteCond %{HTTP_USER_AGENT} ^(.*(craftbot|download|extract|stripper|sucker|ninja|clshttp|webspider|leacher|collector|grabber|webpictures).*) [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+# Limit file upload size (100MB)
+LimitRequestBody 104857600
+

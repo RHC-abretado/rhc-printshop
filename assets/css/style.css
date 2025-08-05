@@ -1,0 +1,757 @@
+@page {
+  margin: 0.5in;
+}
+
+.logo {
+  vertical-align: middle;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* prevent the entire page from ever scrolling horizontally */
+html, body {
+  overflow-x: hidden;
+}
+
+/* make the table wrapper scroll instead */
+.table-responsive {
+  display: block;               /* ensure it can scroll */
+  width: 100%;                  /* fill its parent */
+  overflow-x: auto;             /* horizontal scroll on this div */
+  -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
+}
+
+
+  .print-width {
+      max-width:1920px!important;
+  }
+  .print table {
+    width: 100% !important;
+    table-layout: fixed; /* optional: makes columns have fixed widths */
+  }
+  .print table th {
+    white-space: nowrap;
+    width:35%;
+  }
+  /* Optionally, you can adjust font sizes for printing */
+  @media print {
+    th, td {
+      font-size: 12pt;
+    }
+  }
+    /* Sidebar and Offcanvas styles */
+    .sidebar {
+      min-width: 250px;
+      max-width: 250px;
+      min-height: 100vh;
+      background: #202020;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+      background-color: #fff;
+    }
+    .content {
+      padding: 20px;
+      overflow-x: hidden;
+
+    }
+    .nav-link, .offcanvas {color:#fff;}
+    .offcanvas-body {
+        background: #2A6491;
+    }
+    .offcanvas-body a {
+        color: #fff;
+        text-decoration:none;
+    }
+    .offcanvas-body .nav-link.active, .offcanvas-body .nav-link:hover {
+      background-color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+      .content {
+        margin-left: 0;
+      }
+    }
+    .card-header {
+        background-color:#f9c900;
+        font-weight:700;
+    }
+    .bg-dark {background-color:#202020!important;}
+    footer.bg-dark {background-color:#2a6491!important;}
+    footer.bg-dark a {color:#ffffff;}
+/* Admin Area */
+/* Row color based on data-status attribute */
+    tr[data-status="Processing"] td {
+      background-color: #ffebcc !important;
+    }
+    tr[data-status="Complete"] td {
+      background-color: #d4edda !important; /* light green */
+    }
+    tr[data-status="Canceled"] td {
+      background-color: #f8d7da !important; /* light red/pink */
+    }
+    
+.sortable {
+  cursor: pointer;
+}
+
+  /* Styles for disabled dates in the date picker */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  /* Add a message when hovering over the date input */
+  #date_wanted:hover::after {
+    content: "Orders require at least 3 business days processing time. Weekends are not available.";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 10;
+    width: 250px;
+  }
+  
+.notification-badge {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.notification-badge.zero {
+    display: none;
+}
+
+/* Make nav links flex containers to align badge properly */
+.nav-link {
+    display: flex !important;
+    align-items: center;
+}
+
+.nav-link .bi {margin-right:5px;}
+
+tr[data-status="Hold"] td {
+  background-color: #ADD8E6 !important; 
+}
+
+/* Drag and Drop Upload Styles */
+.drag-drop-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.drag-drop-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f3ff;
+    transform: scale(1.02);
+}
+
+.drag-drop-area.has-files {
+    border-color: #198754;
+    background-color: #d1e7dd;
+}
+
+.drag-drop-area .upload-icon {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.drag-drop-area.dragover .upload-icon {
+    color: #0d6efd;
+}
+
+.drag-drop-area .upload-text {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.drag-drop-area.dragover .upload-text {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.file-list {
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-item .file-info {
+    flex-grow: 1;
+}
+
+.file-item .file-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+.file-item .file-size {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.file-item .remove-file {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.file-item .remove-file:hover {
+    background-color: #dc3545;
+    color: white;
+}
+/* Professional Enhancements */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* Smooth transitions for all interactive elements */
+.nav-link, .btn, .card, .form-control, .form-select, 
+.table tbody tr, .modal, .offcanvas, .dropdown-menu {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced card styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f9c900 0%, #e6b800 100%);
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1.2rem 1.5rem;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+    color:#000000!important;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Enhanced sidebar */
+.sidebar {
+    background: linear-gradient(180deg, #202020 0%, #1a1a1a 100%);
+    border-right: 1px solid rgba(42, 100, 145, 0.2);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .nav-link {
+    margin: 0.25rem 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(42, 100, 145, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.sidebar .nav-link:hover::before {
+    left: 100%;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(42, 100, 145, 0.15);
+    transform: translateX(5px);
+    color: #f9c900;
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, #2A6491 0%, #1e4a6b 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(42, 100, 145, 0.3);
+}
+
+/* Enhanced buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    text-transform: none;
+    letter-spacing: 0.5px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2A6491 0%, #1e4a6b 100%);
+    box-shadow: 0 4px 15px rgba(42, 100, 145, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1e4a6b 0%, #2A6491 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(42, 100, 145, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #146c43 0%, #198754 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
+}
+
+/* Enhanced forms */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1.5px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2A6491;
+    box-shadow: 0 0 0 0.25rem rgba(42, 100, 145, 0.15);
+    background: white;
+    transform: scale(1.02);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+}
+
+/* Enhanced table styling */
+.table {
+
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+
+
+.table thead th {
+    background: linear-gradient(135deg, #2A6491 0%, #1e4a6b 100%);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+    position: relative;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(42, 100, 145, 0.05);
+
+}
+
+/* Enhanced modals */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px 16px 0 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.modal-backdrop {
+    backdrop-filter: blur(8px);
+}
+
+/* Enhanced alerts */
+.alert {
+    border-radius: 10px;
+    border: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(25, 135, 84, 0.05) 100%);
+    color: #146c43;
+    border-left: 4px solid #198754;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+    color: #b02a37;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+    color: #055160;
+    border-left: 4px solid #0dcaf0;
+}
+
+/* Enhanced notification badge */
+.notification-badge {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3); }
+    50% { box-shadow: 0 4px 15px rgba(220, 53, 69, 0.6); }
+    100% { box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3); }
+}
+
+/* Enhanced offcanvas */
+.offcanvas-body {
+    background: linear-gradient(180deg, #2A6491 0%, #1e4a6b 100%);
+}
+
+/* Professional loading states */
+.btn:disabled {
+    opacity: 0.6;
+    transform: none;
+}
+
+/* Smooth page transitions */
+.content {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(135deg, #f9c900 0%, #e6b800 100%);
+    border-radius: 2px;
+}
+
+/* Enhanced list groups */
+.list-group-item {
+    border: none;
+    border-radius: 10px !important;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background: rgba(42, 100, 145, 0.1);
+    transform: translateX(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Professional scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #2A6491 0%, #1e4a6b 100%);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1e4a6b 0%, #2A6491 100%);
+}
+
+/* Enhanced footer */
+footer {
+    background: linear-gradient(135deg, #2a6491 0%, #1e4a6b 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+        border-radius: 10px;
+    }
+    
+
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Focus styles for accessibility */
+.btn:focus, .nav-link:focus, .form-control:focus, .form-select:focus {
+    outline: 2px solid #f9c900;
+    outline-offset: 2px;
+}
+
+/* Professional hover states for clickable elements */
+.clickable, [role="button"], .btn-link {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clickable:hover, [role="button"]:hover {
+    transform: translateY(-1px);
+}
+
+/* Enhanced Mobile Table Scrolling */
+@media (max-width: 768px) {
+    .table-responsive {
+        /* Make scrollbar always visible on mobile */
+        scrollbar-width: thin;
+        scrollbar-color: #2A6491 #f1f1f1;
+        
+        /* Add padding to prevent content cutoff */
+        padding-bottom: 10px;
+        
+        /* Enable momentum scrolling on iOS */
+        -webkit-overflow-scrolling: touch;
+        
+        /* Make it easier to grab and scroll */
+        cursor: grab;
+    }
+    
+    .table-responsive:active {
+        cursor: grabbing;
+    }
+    
+    /* Make scrollbars more prominent on mobile */
+    .table-responsive::-webkit-scrollbar {
+        height: 12px;
+        width: 12px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+        margin: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #2A6491 0%, #1e4a6b 100%);
+        border-radius: 6px;
+        border: 2px solid #f1f1f1;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #1e4a6b 0%, #2A6491 100%);
+    }
+    
+    /* Add visual hint that table is scrollable */
+    .table-responsive::after {
+        content: "← Swipe to scroll →";
+        display: block;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6c757d;
+        padding: 0.5rem;
+        background: linear-gradient(90deg, transparent, #f8f9fa, transparent);
+        margin-top: 0.5rem;
+        border-radius: 4px;
+    }
+    
+    /* Hide the hint after user starts scrolling */
+    .table-responsive.scrolled::after {
+        display: none;
+    }
+}
+
+/* Admin controls - hidden by default */
+.admin-control {
+    display: none !important;
+}
+
+/* Show admin controls when edit mode is active */
+.edit-mode .admin-control {
+    display: block !important;
+}
+
+/* For elements that need to maintain their display type */
+.edit-mode .admin-control.d-flex {
+    display: flex !important;
+}
+
+.edit-mode .admin-control.d-inline-block {
+    display: inline-block !important;
+}
+
+/* Style the toggle button */
+#adminToggle.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* Form validation styles */
+.form-control.is-valid {
+    border-color: #198754;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Disable submit button styling */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

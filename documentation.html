@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHC Printshop System Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --light-bg: #f8fafc;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --hover-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            line-height: 1.6;
+        }
+
+        .hero-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,100 1000,0"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 15px;
+            margin: 1rem;
+            padding: 0;
+            box-shadow: var(--card-shadow);
+            height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem 1rem;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .file-category {
+            margin-bottom: 3rem;
+        }
+
+        .category-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .category-header.core::before { background: var(--primary-gradient); }
+        .category-header.admin::before { background: var(--warning-gradient); }
+        .category-header.ajax::before { background: var(--success-gradient); }
+        .category-header.utility::before { background: var(--info-gradient); }
+        .category-header.config::before { background: var(--dark-gradient); }
+
+        .file-item {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .file-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .file-item:hover::before {
+            width: 8px;
+        }
+
+        .file-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-name::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .file-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .meta-badge.purpose { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .meta-badge.access { background: rgba(46, 213, 115, 0.1); color: #2ed573; }
+        .meta-badge.returns { background: rgba(255, 159, 67, 0.1); color: #ff9f43; }
+
+        .feature-list {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .feature-list ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            color: #64748b;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .overview-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
+
+        .alert-enhanced {
+            border: none;
+            border-radius: 15px;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+        }
+
+        .icon-large {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .category-count {
+            background: rgba(255,255,255,0.9);
+            color: #2c3e50;
+            font-weight: 600;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .tech-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .architecture-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .flow-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+                margin: 1rem 0;
+            }
+            
+            .hero-header {
+                padding: 2rem 0;
+            }
+            
+            .architecture-flow {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-highlight {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-book-fill me-3"></i>
+                    RHC Printshop System Documentation
+                </h1>
+                <p class="lead mb-4">Comprehensive guide to the printshop management system architecture and components</p>
+                <div class="tech-stack justify-content-center">
+                    <span class="tech-item">PHP 8.0+</span>
+                    <span class="tech-item">MySQL</span>
+                    <span class="tech-item">Bootstrap 5</span>
+                    <span class="tech-item">AJAX/JSON</span>
+                    <span class="tech-item">PHPMailer</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Enhanced Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block">
+                <div class="sidebar">
+                    <div class="sidebar-brand">
+                        <h5 class="mb-1">
+                            <i class="bi bi-compass me-2"></i>
+                            Navigation
+                        </h5>
+                        <small class="text-white-50">System Documentation</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview">
+                                <i class="bi bi-house me-2"></i> System Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#core-files">
+                                <i class="bi bi-gear-fill me-2"></i> Core Application
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#admin-files">
+                                <i class="bi bi-shield-lock-fill me-2"></i> Admin Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#ajax-handlers">
+                                <i class="bi bi-arrow-repeat me-2"></i> AJAX Handlers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#utility-files">
+                                <i class="bi bi-tools me-2"></i> Utility Files
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#config-files">
+                                <i class="bi bi-gear me-2"></i> Configuration
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#assets">
+                                <i class="bi bi-folder-fill me-2"></i> Assets & Libraries
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#database-schema">
+                                <i class="bi bi-database-fill me-2"></i> Database Schema
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#security">
+                                <i class="bi bi-shield-check-fill me-2"></i> Security Features
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- System Overview -->
+                <section id="overview" class="fade-in">
+                    <div class="overview-section">
+                        <div class="row align-items-center mb-4">
+                            <div class="col-md-8">
+                                <h2 class="h3 mb-3">
+                                    <i class="bi bi-info-circle-fill icon-large"></i>
+                                    System Overview
+                                </h2>
+                                <p class="lead text-muted">A modern, comprehensive web application built for Río Hondo College's printshop operations, featuring role-based access control, multi-device session management, and automated workflows.</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="stats-card">
+                                    <div class="stats-number">2.0</div>
+                                    <div class="text-muted fw-bold">Current Version</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert-enhanced mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-rocket-takeoff me-2"></i>
+                                Project Information
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Developer:</strong> Albert Bretado</p>
+                                    <p><strong>Last Updated:</strong> June 2025</p>
+                                    <p><strong>Institution:</strong> Río Hondo College</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Framework:</strong> PHP/MySQL/Bootstrap</p>
+                                    <p><strong>Architecture:</strong> MVC-inspired modular design</p>
+                                    <p><strong>Dependencies:</strong> PHPMailer, Bootstrap Icons</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Architecture Flow -->
+                        <h5 class="mb-3">System Architecture Flow</h5>
+                        <div class="architecture-flow">
+                            <div class="flow-item">
+                                <i class="bi bi-person-circle icon-large"></i>
+                                <h6>User Access</h6>
+                                <small>Public forms, authentication, role-based routing</small>
+                            </div>
+                            <div class="flow-arrow">
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+                            <div class="flow-item">
+                                <i class="bi bi-server icon-large"></i>
+                                <h6>Core Processing</h6>
+                                <small>Form handling, validation, database operations</small>
+                            </div>
+                            <div class="flow-arrow">
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+                            <div class="flow-item">
+                                <i class="bi bi-gear-wide icon-large"></i>
+                                <h6>Admin Management</h6>
+                                <small>Ticket processing, user management, analytics</small>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">42</div>
+                                    <div class="text-muted fw-bold">Total Files</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">5</div>
+                                    <div class="text-muted fw-bold">User Roles</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">7</div>
+                                    <div class="text-muted fw-bold">Database Tables</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Core Application Files -->
+                <section id="core-files" class="file-category fade-in">
+                    <div class="category-header core">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h3 mb-0">
+                                <i class="bi bi-gear-fill me-3"></i>
+                                Core Application Files
+                            </h2>
+                            <span class="category-count">12 files</span>
+                        </div>
+                        <p class="text-muted mb-0">Primary user-facing pages that handle core functionality and user interactions</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">index.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-house"></i> Homepage & Dashboard
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-globe"></i> Public Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Main landing page and navigation hub for all users</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Welcome interface with quick action buttons</li>
+                                <li>Print request access and status checking</li>
+                                <li>Navigation menu with role-based visibility</li>
+                                <li>Copyright information and policies</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">newticket.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-plus-circle"></i> Print Request Form
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-globe"></i> Public Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Comprehensive print job submission interface</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Multi-step form with conditional field visibility</li>
+                                <li>Real-time cost estimation calculator</li>
+                                <li>File upload with validation (PDFs, images, documents)</li>
+                                <li>Business day validation for due dates</li>
+                                <li>CSRF protection and form tokens</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">submit_request.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-server"></i> Form Processing
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Response
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Backend processor for print request submissions</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>AJAX-based form handling with progress tracking</li>
+                                <li>Custom ticket number generation (YYYYMMXXX format)</li>
+                                <li>Secure file upload processing and storage</li>
+                                <li>Automated email notifications to staff and requesters</li>
+                                <li>Activity logging and audit trail creation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">viewtickets.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-list-check"></i> Ticket Management
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Admin+ Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Main administrative interface for processing tickets</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Paginated ticket list with filtering and sorting</li>
+                                <li>Modal-based ticket details with inline editing</li>
+                                <li>Status management (New → Processing → Complete)</li>
+                                <li>Cost tracking and administrative notes</li>
+                                <li>Ticket assignment to staff members</li>
+                                <li>Role-based visibility (Admins see assigned, Managers see all)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">check_status.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-search"></i> Status Lookup
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-globe"></i> Public Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Public interface for checking ticket progress</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Ticket number-based status lookup</li>
+                                <li>Progress information display</li>
+                                <li>Access logging for audit purposes</li>
+                                <li>AJAX-powered modal integration</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">login.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-box-arrow-in-right"></i> Authentication
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-globe"></i> Public Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> User authentication and session management</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Secure login with password verification</li>
+                                <li>Remember Me functionality with device tracking</li>
+                                <li>Cloudflare Turnstile bot protection</li>
+                                <li>Auto-login via secure tokens</li>
+                                <li>Multi-device session support</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Continue with other core files... -->
+                    <div class="file-item">
+                        <h5 class="file-name">my_account.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-person-gear"></i> Account Management
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Admin+ Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> User profile and session management interface</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Profile editing (email, password updates)</li>
+                                <li>Active device session monitoring</li>
+                                <li>Individual device logout capability</li>
+                                <li>Bulk session termination</li>
+                                <li>Security activity logging</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">pricing.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-coin"></i> Pricing Information
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-globe"></i> Public Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Public pricing and service information</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Detailed pricing tables by service type</li>
+                                <li>Paper type and size information</li>
+                                <li>Binding and finishing costs</li>
+                                <li>Special service rates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Management Files -->
+                <section id="admin-files" class="file-category fade-in">
+                    <div class="category-header admin">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h3 mb-0">
+                                <i class="bi bi-shield-lock-fill me-3"></i>
+                                Admin Management Files
+                            </h2>
+                            <span class="category-count">10 files</span>
+                        </div>
+                        <p class="text-muted mb-0">Administrative interfaces and management tools for system control</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">settings.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-gear-wide-connected"></i> System Settings Hub
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield-lock"></i> Super Admin Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Centralized configuration management interface</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Email and SMTP configuration with encryption</li>
+                                <li>Location code management (CRUD operations)</li>
+                                <li>User management dashboard</li>
+                                <li>System cache and debug controls</li>
+                                <li>Storage and performance monitoring</li>
+                                <li>Tabbed interface for organized settings</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">analytics.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-graph-up"></i> System Analytics
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Admin+ Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Performance metrics and reporting dashboard</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Interactive charts with Chart.js integration</li>
+                                <li>12-month submission trends</li>
+                                <li>User performance statistics</li>
+                                <li>Department-wise analytics</li>
+                                <li>Completion time analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Continue with other admin files briefly -->
+                    <div class="file-item">
+                        <h5 class="file-name">user_management.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-people"></i> User Administration
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield-lock"></i> Super Admin Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Complete user account lifecycle management</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">export.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-download"></i> Data Export
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-csv"></i> CSV Output
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Comprehensive data export with filtering capabilities</p>
+                    </div>
+                </section>
+
+                <!-- AJAX Handlers -->
+                <section id="ajax-handlers" class="file-category fade-in">
+                    <div class="category-header ajax">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h3 mb-0">
+                                <i class="bi bi-arrow-repeat me-3"></i>
+                                AJAX Handlers
+                            </h2>
+                            <span class="category-count">8 files</span>
+                        </div>
+                        <p class="text-muted mb-0">Backend API endpoints for asynchronous operations and real-time updates</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">update_status.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-arrow-clockwise"></i> Status Updates
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Response
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Real-time ticket status management with notifications</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Status transitions (New → Processing → Complete)</li>
+                                <li>Automated email notifications on status changes</li>
+                                <li>Activity logging with detailed tracking</li>
+                                <li>Assignment handling and timestamp management</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">assign_ticket.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-person-plus"></i> Ticket Assignment
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Manager+ Only
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Assign tickets to staff with notification system</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">get_ticket_count.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-bell"></i> Notification Count
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Count
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Real-time notification badge updates</p>
+                    </div>
+                </section>
+
+                <!-- Database Schema -->
+                <section id="database-schema" class="fade-in">
+                    <div class="overview-section">
+                        <h2 class="h3 mb-4">
+                            <i class="bi bi-database-fill icon-large"></i>
+                            Database Schema Overview
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="file-item">
+                                    <h5 class="file-name">Core Tables</h5>
+                                    <div class="feature-list">
+                                        <ul>
+                                            <li><span class="code-highlight">job_tickets</span> - Main ticket records with all form data</li>
+                                            <li><span class="code-highlight">users</span> - User accounts and authentication</li>
+                                            <li><span class="code-highlight">location_codes</span> - Department billing codes</li>
+                                            <li><span class="code-highlight">email_settings</span> - SMTP and notification config</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="file-item">
+                                    <h5 class="file-name">Security & Tracking</h5>
+                                    <div class="feature-list">
+                                        <ul>
+                                            <li><span class="code-highlight">user_remember_tokens</span> - Multi-device sessions</li>
+                                            <li><span class="code-highlight">activity_log</span> - Audit trail and user actions</li>
+                                            <li><span class="code-highlight">password_resets</span> - Secure password reset tokens</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Security Features -->
+                <section id="security" class="fade-in">
+                    <div class="overview-section">
+                        <h2 class="h3 mb-4">
+                            <i class="bi bi-shield-check-fill icon-large"></i>
+                            Security Features
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="file-item">
+                                    <h5 class="file-name">Authentication & Authorization</h5>
+                                    <div class="feature-list">
+                                        <ul>
+                                            <li>Role-based access control (5 user levels)</li>
+                                            <li>Multi-device session management</li>
+                                            <li>Secure "Remember Me" with device tracking</li>
+                                            <li>Token-based password reset system</li>
+                                            <li>Cloudflare Turnstile bot protection</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="file-item">
+                                    <h5 class="file-name">Data Protection</h5>
+                                    <div class="feature-list">
+                                        <ul>
+                                            <li>CSRF token protection on all forms</li>
+                                            <li>Prepared SQL statements (no injection)</li>
+                                            <li>File upload validation and sanitization</li>
+                                            <li>AES-256-CBC encrypted SMTP passwords</li>
+                                            <li>Comprehensive activity logging</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="text-center py-5 mt-5">
+                    <div class="overview-section">
+                        <h5 class="mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Documentation Information
+                        </h5>
+                        <p class="text-muted mb-3">
+                            This comprehensive documentation covers all components of the RHC Printshop Management System.
+                            For technical support, feature requests, or contributions, contact the development team.
+                        </p>
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-center gap-4 flex-wrap">
+                                    <span class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        Generated: <span id="currentDate"></span>
+                                    </span>
+                                    <span class="text-muted">
+                                        <i class="bi bi-tag me-1"></i>
+                                        Version: 2.0
+                                    </span>
+                                    <span class="text-muted">
+                                        <i class="bi bi-person me-1"></i>
+                                        Developer: Albert Bretado
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+        
+        // Smooth scrolling and active navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Update active nav link on scroll with intersection observer
+        const observerOptions = {
+            rootMargin: '-20% 0px -70% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Add fade-in animation to elements as they come into view
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        });
+
+        document.querySelectorAll('.file-item, .stats-card').forEach(el => {
+            fadeObserver.observe(el);
+        });
+    </script>
+</body>
+</html>

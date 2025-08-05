@@ -1,0 +1,259 @@
+@page {
+  margin: 0.5in;
+}
+
+.logo {
+  vertical-align: middle;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* prevent the entire page from ever scrolling horizontally */
+html, body {
+  overflow-x: hidden;
+}
+
+/* make the table wrapper scroll instead */
+.table-responsive {
+  display: block;               /* ensure it can scroll */
+  width: 100%;                  /* fill its parent */
+  overflow-x: auto;             /* horizontal scroll on this div */
+  -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
+}
+
+
+  .print-width {
+      max-width:1920px!important;
+  }
+  .print table {
+    width: 100% !important;
+    table-layout: fixed; /* optional: makes columns have fixed widths */
+  }
+  .print table th {
+    white-space: nowrap;
+    width:35%;
+  }
+  /* Optionally, you can adjust font sizes for printing */
+  @media print {
+    th, td {
+      font-size: 12pt;
+    }
+  }
+    /* Sidebar and Offcanvas styles */
+    .sidebar {
+      min-width: 250px;
+      max-width: 250px;
+      min-height: 100vh;
+      background: #202020;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+      background-color: #fff;
+    }
+    .content {
+      padding: 20px;
+      overflow-x: hidden;
+
+    }
+    .nav-link, .offcanvas {color:#fff;}
+    .offcanvas-body {
+        background: #2A6491;
+    }
+    .offcanvas-body a {
+        color: #fff;
+        text-decoration:none;
+    }
+    .offcanvas-body .nav-link.active, .offcanvas-body .nav-link:hover {
+      background-color: #fff;
+    }
+    
+    @media (max-width: 768px) {
+      .content {
+        margin-left: 0;
+      }
+    }
+    .card-header {
+        background-color:#f9c900;
+        font-weight:700;
+    }
+    .bg-dark {background-color:#202020!important;}
+    footer.bg-dark {background-color:#2a6491!important;}
+    footer.bg-dark a {color:#ffffff;}
+/* Admin Area */
+/* Row color based on data-status attribute */
+    tr[data-status="Processing"] td {
+      background-color: #ffebcc !important;
+    }
+    tr[data-status="Complete"] td {
+      background-color: #d4edda !important; /* light green */
+    }
+    tr[data-status="Canceled"] td {
+      background-color: #f8d7da !important; /* light red/pink */
+    }
+    
+.sortable {
+  cursor: pointer;
+}
+
+  /* Styles for disabled dates in the date picker */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  /* Add a message when hovering over the date input */
+  #date_wanted:hover::after {
+    content: "Orders require at least 3 business days processing time. Weekends are not available.";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 10;
+    width: 250px;
+  }
+  
+.notification-badge {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.notification-badge.zero {
+    display: none;
+}
+
+/* Make nav links flex containers to align badge properly */
+.nav-link {
+    display: flex !important;
+    align-items: center;
+}
+
+.nav-link .bi {margin-right:5px;}
+
+tr[data-status="Hold"] td {
+  background-color: #ADD8E6 !important; 
+}
+
+/* Drag and Drop Upload Styles */
+.drag-drop-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.drag-drop-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f3ff;
+    transform: scale(1.02);
+}
+
+.drag-drop-area.has-files {
+    border-color: #198754;
+    background-color: #d1e7dd;
+}
+
+.drag-drop-area .upload-icon {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.drag-drop-area.dragover .upload-icon {
+    color: #0d6efd;
+}
+
+.drag-drop-area .upload-text {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.drag-drop-area.dragover .upload-text {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.file-list {
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-item .file-info {
+    flex-grow: 1;
+}
+
+.file-item .file-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+.file-item .file-size {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.file-item .remove-file {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.file-item .remove-file:hover {
+    background-color: #dc3545;
+    color: white;
+}
