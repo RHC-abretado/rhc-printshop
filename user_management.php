@@ -14,6 +14,7 @@ if (
 }
 
 require_once 'assets/database.php';
+$protectedUsers = require __DIR__ . '/config/protected_users.php';
 
 $message = '';
 // ———————————————
@@ -63,13 +64,17 @@ try {
     $stmt  = $pdo->query("
       SELECT id, first_name, last_name, username, email, role
         FROM users
+       WHERE protected = 0
        ORDER BY created_at DESC
     ");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $users = array_filter(
+        $users,
+        fn($u) => !in_array($u['username'], $protectedUsers, true)
+    );
 } catch(PDOException $e) {
     die("DB Error: " . htmlspecialchars($e->getMessage()));
 }
-
 // helper to rename “Admin” → “User”
 function displayRole(string $r): string {
     return $r==='Admin' ? 'User' : $r;
