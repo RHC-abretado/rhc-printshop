@@ -5,6 +5,19 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 header('Content-Type: application/json');
 
+// Verify authentication and authorization (Admin or higher)
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit;
+}
+$allowedRoles = ['Admin', 'Manager', 'Super Admin'];
+if (!in_array($_SESSION['role'] ?? '', $allowedRoles, true)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden']);
+    exit;
+}
+
 require_once __DIR__ . '/assets/database.php';
 require_once __DIR__ . '/helpers/encryption.php';
 require_once __DIR__ . '/libs/phpmailer/src/Exception.php';
