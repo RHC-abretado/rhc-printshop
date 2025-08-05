@@ -1,10 +1,17 @@
 <?php
 // database.php
 
-$dbHost = 'localhost';
-$dbName = 'riohondoprint_printing';
-$dbUser = 'riohondoprint_printing';
-$dbPass = 'USarmy2016!?';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$dotenvPath = dirname(__DIR__, 2);
+if (file_exists($dotenvPath . '/.env')) {
+    Dotenv\Dotenv::createImmutable($dotenvPath)->safeLoad();
+}
+
+$dbHost = getenv('DB_HOST') ?: $_ENV['DB_HOST'] ?? $_SERVER['DB_HOST'] ?? '';
+$dbName = getenv('DB_NAME') ?: $_ENV['DB_NAME'] ?? $_SERVER['DB_NAME'] ?? '';
+$dbUser = getenv('DB_USER') ?: $_ENV['DB_USER'] ?? $_SERVER['DB_USER'] ?? '';
+$dbPass = getenv('DB_PASS') ?: $_ENV['DB_PASS'] ?? $_SERVER['DB_PASS'] ?? '';
 
 /**
  * Convert a MySQL timestamp string (assumed UTC) to Los Angeles time.
@@ -35,3 +42,4 @@ try {
 } catch (PDOException $e) {
     die('Database Connection Failed: ' . $e->getMessage());
 }
+
