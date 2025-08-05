@@ -10,28 +10,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 // 2) If logged in, require the header (which also gives you $pdo)
 require_once 'header.php';
-
-// 3) Fetch tickets with role-based filtering
-try {
-    if (in_array($_SESSION['role'], ['Manager','Super Admin'], true)) {
-        // Managers & Super Admins see everything
-        $sql  = "SELECT * FROM job_tickets ORDER BY created_at DESC";
-        $stmt = $pdo->query($sql);
-    } else {
-        // Plain Admins see only tickets assigned to themselves
-        $sql  = "SELECT * 
-                   FROM job_tickets 
-                  WHERE assigned_to = :user 
-                  ORDER BY created_at DESC";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-          ':user' => $_SESSION['username']
-        ]);
-    }
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Database error: " . htmlspecialchars($e->getMessage()));
-}
 ?>
 
 
@@ -41,7 +19,6 @@ try {
 <div class="card">
   <div class="card-header">Tickets List</div>
   <div class="card-body">
-    <?php if (!empty($tickets)) : ?>
       <div class="row mb-3">
   <div class="col-auto">
     <label for="statusFilter" class="form-label">Filter by Status:</label>
@@ -79,81 +56,13 @@ try {
               <th>View/Print</th>
             </tr>
           </thead>
-          <tbody>
-            <?php foreach ($tickets as $row): 
-    $numericId  = $row['id'];  
-    $ticketNum  = $row['ticket_number'] ?? ''; 
-    $status     = $row['ticket_status'] ?? 'New';
-
-    // copy into rowData for our modal payload
-    $rowData = $row;
-
-    // format those two timestamps on rowData, not $row
-    $rowData['created_at']         = toLA($row['created_at'], 'm-d-Y H:i:s');
-
-
-$rowData['created_at_display'] = toLA($row['created_at'], 'm-d-Y H:i:s');
-$rowData['date_wanted']        = date('m-d-Y', strtotime($row['date_wanted']));
-$rowData['date_wanted_display']= date('m-d-Y', strtotime($row['date_wanted']));
-
-
-if (!empty($row['completed_at'])) {
-    $rowData['completed_at_display'] = toLA($row['completed_at'], 'm-d-Y H:i:s');
-
-    // keep raw *LA-time* strings so JS parses the right value
-    $rowData['created_at_raw']   = toLA($row['created_at'], 'Y-m-d H:i:s');
-    $rowData['completed_at_raw'] = toLA($row['completed_at'], 'Y-m-d H:i:s');
-}
-
-    // now encode the formatted rowData
-    $ticketJson = htmlspecialchars(json_encode($rowData), ENT_QUOTES, 'UTF-8');
-
-    // build your snippet as before...
-    $notesSnippet = '';
-    if (!empty($row['admin_notes'])) {
-      $fullNotes = $row['admin_notes'];
-      $notesSnippet = (strlen($fullNotes) > 50) 
-                     ? substr($fullNotes, 0, 50) . '...' 
-                     : $fullNotes;
-    }
-?>
-<tr data-id="<?= $numericId ?>" data-status="<?= htmlspecialchars($status) ?>" 
-    data-ticket="<?= $ticketJson ?>">
-              <td><?= htmlspecialchars($ticketNum) ?></td>
-              <td><?= htmlspecialchars($status) ?></td>
-              <td><?= htmlspecialchars(toLA($row['created_at'], 'm/d/Y')) ?></td>
-<td><?= htmlspecialchars(date('m/d/Y', strtotime($row['date_wanted']))) ?></td>
-
-              <td><?= htmlspecialchars($row['job_title']) ?></td>
-              <td><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
-              <td><?= htmlspecialchars($notesSnippet) ?></td>
-              <td><?= htmlspecialchars($row['assigned_to'] ?? '') ?></td>
-              <td>
-                <div class="btn-group" role="group" aria-label="View and Print">
-                  <button type="button" class="btn btn-sm btn-info" 
-                          data-bs-toggle="modal" 
-                          data-bs-target="#ticketModal" 
-                          data-ticket="<?= $ticketJson ?>">
-                    View
-                  </button>
-                  <a href="print_preview.php?ticket=<?= urlencode($ticketNum) ?>" 
-                     target="_blank" 
-                     class="btn btn-sm btn-secondary">
-                    Print
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <?php endforeach; ?>
-          </tbody>
+          <tbody></tbody>
         </table>
+        <p id="noTickets" style="display:none;">No tickets found.</p>
         <nav>
           <ul class="pagination" id="paginationControls"></ul>
         </nav>
       </div>
-    <?php else : ?>
-      <p>No tickets found.</p>
-    <?php endif; ?>
   </div>
 </div>
 
@@ -234,47 +143,51 @@ if (!empty($row['completed_at'])) {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // --- 1) State & Elements ---
-  let sortDir = 0; // 0 = off, 1 = asc, -1 = desc
-  const dueHeader    = document.querySelector('#ticketsTable thead th:nth-child(4)');
   const statusFilter = document.getElementById('statusFilter');
+  const searchFilter = document.getElementById('searchFilter');
   const tbody        = document.querySelector('#ticketsTable tbody');
   const pagination   = document.getElementById('paginationControls');
-  const allRows      = Array.from(tbody.querySelectorAll('tr'));
+  const noTickets    = document.getElementById('noTickets');
   const pageSize     = 30;
+  let currentPage    = 1;
 
-  // --- 2) Setup the Due Date header toggle ---
-  if (dueHeader) {
-    dueHeader.style.cursor = 'pointer';
-    const updateArrow = () => {
-      if (sortDir === 0)       dueHeader.textContent = 'Due Date';
-      else if (sortDir === 1)  dueHeader.textContent = 'Due Date ↑';
-      else                     dueHeader.textContent = 'Due Date ↓';
-    };
-    // On click: if off turn on asc; otherwise flip
-    dueHeader.addEventListener('click', () => {
-      sortDir = sortDir === 0 ? 1 : -sortDir;
-      updateArrow();
-      applyFilterAndPaginate();
-    });
-    updateArrow();
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text ?? '';
+    return div.innerHTML;
   }
 
-  // --- 3) Core: filter, sort, paginate, render ---
-  function parseDateCell(cell) {
-    // expects MM/DD/YYYY
-    const [m, d, y] = cell.innerText.split('/');
-    return new Date(y, m - 1, d);
+  function buildRow(row) {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-id', row.id);
+    tr.setAttribute('data-status', row.ticket_status);
+    tr.setAttribute('data-ticket', JSON.stringify(row));
+
+    const notesSnippet = row.admin_notes ? (row.admin_notes.length > 50 ? row.admin_notes.substring(0,50) + '...' : row.admin_notes) : '';
+    tr.innerHTML = `
+      <td>${escapeHtml(row.ticket_number)}</td>
+      <td>${escapeHtml(row.ticket_status)}</td>
+      <td>${escapeHtml(row.created_at_display)}</td>
+      <td>${escapeHtml(row.date_wanted_display)}</td>
+      <td>${escapeHtml(row.job_title)}</td>
+      <td>${escapeHtml(row.first_name + ' ' + row.last_name)}</td>
+      <td>${escapeHtml(notesSnippet)}</td>
+      <td>${escapeHtml(row.assigned_to || '')}</td>
+      <td>
+        <div class=\"btn-group\" role=\"group\" aria-label=\"View and Print\">
+          <button type=\"button\" class=\"btn btn-sm btn-info\"
+                  data-bs-toggle=\"modal\"
+                  data-bs-target=\"#ticketModal\"
+                  data-ticket='${escapeHtml(JSON.stringify(row))}'>View</button>
+          <a href=\"print_preview.php?ticket=${encodeURIComponent(row.ticket_number)}\"
+             target=\"_blank\" class=\"btn btn-sm btn-secondary\">Print</a>
+        </div>
+      </td>
+    `;
+    return tr;
   }
 
-  function renderPage(rows, page) {
-    // clear existing rows
-    tbody.innerHTML = '';
-    // show only the slice for this page
-    const start = (page - 1) * pageSize;
-    rows.slice(start, start + pageSize).forEach(r => tbody.appendChild(r));
-    // build pagination controls
-    const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  function buildPagination(totalPages, page) {
     pagination.innerHTML = '';
     for (let p = 1; p <= totalPages; p++) {
       const li = document.createElement('li');
@@ -283,70 +196,45 @@ document.addEventListener('DOMContentLoaded', () => {
       a.className = 'page-link';
       a.href = '#';
       a.textContent = p;
-      a.addEventListener('click', ev => {
-        ev.preventDefault();
-        renderPage(rows, p);
-      });
+      a.addEventListener('click', ev => { ev.preventDefault(); loadTickets(p); });
       li.appendChild(a);
       pagination.appendChild(li);
     }
   }
 
-function applyFilterAndPaginate() {
-  // 1) filter by status
-  const sel = statusFilter.value;
-  const searchTerm = document.getElementById('searchFilter').value.toLowerCase().trim();
-  
-  let filtered = allRows.filter(r => {
-    // Status filter
-    const statusMatch = sel === 'All' || r.getAttribute('data-status') === sel;
-    
-    // Search filter - if no search term, return true
-    if (!searchTerm) return statusMatch;
-    
-    // Get the text content from relevant columns
-    const name = (r.children[5].textContent || '').toLowerCase(); // Name column
-    const locationCode = (r.children[7].textContent || '').toLowerCase(); // Assigned To column
-    
-    // Also search in the JSON data for department_name and location_code
-    try {
-      const ticketData = JSON.parse(r.getAttribute('data-ticket'));
-      const departmentName = (ticketData.department_name || '').toLowerCase();
-      const actualLocationCode = (ticketData.location_code || '').toLowerCase();
-      
-      const searchMatch = name.includes(searchTerm) || 
-                         locationCode.includes(searchTerm) ||
-                         departmentName.includes(searchTerm) ||
-                         actualLocationCode.includes(searchTerm);
-      
-      return statusMatch && searchMatch;
-    } catch (e) {
-      // Fallback if JSON parsing fails
-      const searchMatch = name.includes(searchTerm) || locationCode.includes(searchTerm);
-      return statusMatch && searchMatch;
-    }
-  });
-  
-  // 2) sort by Due Date cell (4th <td>)
-  filtered.sort((a, b) => {
-    const da = parseDateCell(a.children[3]);
-    const db = parseDateCell(b.children[3]);
-    return sortDir * (da - db);
-  });
-  // 3) render page #1
-  renderPage(filtered, 1);
-}
+  function loadTickets(page = 1) {
+    const status = statusFilter.value;
+    const search = searchFilter.value.trim();
+    fetch(`get_tickets.php?page=${page}&size=${pageSize}&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`)
+      .then(r => r.json())
+      .then(data => {
+        tbody.innerHTML = '';
+        if (data.tickets.length === 0) {
+          noTickets.style.display = 'block';
+        } else {
+          noTickets.style.display = 'none';
+          data.tickets.forEach(t => tbody.appendChild(buildRow(t)));
+        }
+        buildPagination(data.totalPages, page);
+        currentPage = page;
+      })
+      .catch(() => {
+        tbody.innerHTML = '';
+        noTickets.style.display = 'block';
+      });
+  }
 
-statusFilter.addEventListener('change', applyFilterAndPaginate);
-document.getElementById('searchFilter').addEventListener('input', applyFilterAndPaginate);
-document.getElementById('clearFilters').addEventListener('click', () => {
-  statusFilter.value = 'All';
-  document.getElementById('searchFilter').value = '';
-  applyFilterAndPaginate();
-});
-applyFilterAndPaginate();;
+  statusFilter.addEventListener('change', () => loadTickets(1));
+  searchFilter.addEventListener('input', () => loadTickets(1));
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    statusFilter.value = 'All';
+    searchFilter.value = '';
+    loadTickets(1);
+  });
 
-  // --- 4) Modal / details logic (unchanged) ---
+  loadTickets(1);
+
+  // --- Modal / details logic ---
   let currentTicketId = null;
   const ticketModalEl = document.getElementById('ticketModal');
   const displayNames = {
@@ -378,132 +266,87 @@ applyFilterAndPaginate();;
     "cut_paper","separator_color","staple_location","fold_type","binding_type",
     "created_at","file_path","assigned_to","admin_notes","total_cost"
   ];
-  
-    function parseLocalDatetime(dtstr) {
+
+  function parseLocalDatetime(dtstr) {
     const [datePart, timePart] = dtstr.split(' ');
     const [year, month, day]   = datePart.split('-').map(n => +n);
     const [hour, min, sec]     = timePart.split(':').map(n => +n);
     return new Date(year, month - 1, day, hour, min, sec);
   }
-  
+
   ticketModalEl.addEventListener('show.bs.modal', ev => {
     const btn  = ev.relatedTarget;
     const data = JSON.parse(btn.getAttribute('data-ticket'));
     currentTicketId = data.id;
-    
+
     fetch('activity.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ticket_number: data.ticket_number })
-    }).catch(() => {
-      // Silently fail if logging doesn't work - don't interrupt user experience
-    });
-    
+    }).catch(() => {});
+
     let html = '';
     keysOrder.forEach(k => {
       if (!data[k]) return;
       if (k === 'file_path' && data.file_path) {
-  // split on commas
-  const files = data.file_path.split(',');
-  // map each URL to a <a> containing only its filename
-  const links = files.map(fp => {
-    const name = fp.substring(fp.lastIndexOf('/') + 1);
-    return `<a href="${fp}" target="_blank">${name}</a>`;
-  }).join('<br>');
-  html += `<tr>
-    <th>${displayNames[k]}</th>
-    <td>${links}</td>
-  </tr>`;
-}
- else {
+        const files = data.file_path.split(',');
+        const links = files.map(fp => {
+          const name = fp.substring(fp.lastIndexOf('/') + 1);
+          return `<a href=\"${fp}\" target=\"_blank\">${name}</a>`;
+        }).join('<br>');
+        html += `<tr><th>${displayNames[k]}</th><td>${links}</td></tr>`;
+      } else {
         html += `<tr><th>${displayNames[k]}</th><td>${data[k]}</td></tr>`;
       }
     });
-      // --- if ticket’s been completed, show Completed On + Turnaround Time ---
-  if (data.completed_at_raw) {
-    // Completed On row
-    html += `
-      <tr>
-        <th>Completed On</th>
-        <td>${data.completed_at_display}</td>
-      </tr>`;
-
-    // Compute difference
-    const start = parseLocalDatetime(data.created_at_raw);
+    if (data.completed_at_raw) {
+      html += `<tr><th>Completed On</th><td>${data.completed_at_display}</td></tr>`;
+      const start = parseLocalDatetime(data.created_at_raw);
       const end   = parseLocalDatetime(data.completed_at_raw);
-      let delta   = end - start; // always ms ≥ 0
-
-    // Break into days/hours/minutes
-    const days    = Math.floor(delta / 86400000);
-    delta %= 86400000;
-    const hours   = Math.floor(delta / 3600000);
-    delta %= 3600000;
-    const minutes = Math.floor(delta / 60000);
-
-    // Turnaround Time row
-    html += `
-      <tr>
-        <th>Turnaround Time</th>
-        <td>${days}d ${hours}h ${minutes}m</td>
-      </tr>`;
-  }
-
+      let delta   = end - start;
+      const days  = Math.floor(delta / 86400000);
+      delta      %= 86400000;
+      const hours = Math.floor(delta / 3600000);
+      delta      %= 3600000;
+      const minutes = Math.floor(delta / 60000);
+      html += `<tr><th>Turnaround Time</th><td>${days}d ${hours}h ${minutes}m</td></tr>`;
+    }
 
     document.querySelector('#ticketDetailsTable tbody').innerHTML = html;
     document.getElementById('totalCostInput').value = data.total_cost || '';
     document.getElementById('adminNotesTextarea').value = data.admin_notes || '';
-    
-    // show/hide Complete option
-const completeOption = document.getElementById('completeOption');
-if (completeOption) {
-  completeOption.style.display = data.ticket_status.toLowerCase() === 'processing' ? '' : 'none';
-}
+
+    const completeOption = document.getElementById('completeOption');
+    if (completeOption) {
+      completeOption.style.display = data.ticket_status.toLowerCase() === 'processing' ? '' : 'none';
+    }
   });
 
-// --- 5) Status updates ---
-function updateStatus(st) {
-  if (!currentTicketId) return;
-  fetch('update_status.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ticket_id: currentTicketId, ticket_status: st })
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (!d.success) return alert('Error: ' + d.error);
+  function updateStatus(st) {
+    if (!currentTicketId) return;
+    fetch('update_status.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticket_id: currentTicketId, ticket_status: st })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.success) return alert('Error: ' + d.error);
+      if (d.refresh) { window.location.reload(); return; }
+      updateTicketBadges();
+      bootstrap.Modal.getInstance(ticketModalEl).hide();
+      loadTickets(currentPage);
+    })
+    .catch(() => alert('Ajax error'));
+  }
 
-    // ← reload page if backend told us to
-    if (d.refresh) {
-      window.location.reload();
-      return;
-    }
-    
-    updateTicketBadges(); // Refresh badge count
-
-    // otherwise do your normal UI update
-    bootstrap.Modal.getInstance(ticketModalEl).hide();
-    const row = document.querySelector(`tr[data-id="${currentTicketId}"]`);
-    if (row) {
-      row.setAttribute('data-status', st);
-      row.children[1].innerText = st;
-      // re-render current page to re-apply filter/sort
-      applyFilterAndPaginate();
-      updateTicketBadges(); // Refresh badge count
-    }
-  })
-  .catch(() => alert('Ajax error'));
-}
-
-// Handle status dropdown clicks
-document.querySelectorAll('.dropdown-item[data-status]').forEach(item => {
-  item.addEventListener('click', function(e) {
-    e.preventDefault();
-    const status = this.getAttribute('data-status');
-    updateStatus(status);
+  document.querySelectorAll('.dropdown-item[data-status]').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      updateStatus(this.getAttribute('data-status'));
+    });
   });
-});
 
-  // --- 6) Save admin notes ---
   document.getElementById('saveNotesBtn').addEventListener('click', () => {
     if (!currentTicketId) return;
     const notes = document.getElementById('adminNotesTextarea').value.trim();
@@ -521,34 +364,30 @@ document.querySelectorAll('.dropdown-item[data-status]').forEach(item => {
     })
     .catch(()=>alert('Ajax error'));
   });
-  
-  // --- 8) Total Cost handling ---
-document.getElementById('saveCostBtn').addEventListener('click', function() {
-  if (!currentTicketId) {
-    console.error('No ticket ID available');
-    alert('Error: No ticket selected');
-    return;
-  }
-  
-  const cost = parseFloat(document.getElementById('totalCostInput').value) || 0;
-  
-  fetch('update_cost.php', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ticket_id: currentTicketId, total_cost: cost})
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (!d.success) return alert('Error: ' + d.error);
-    alert('Cost updated successfully');
-  })
-  .catch(err => {
-    console.error('Ajax error:', err);
-    alert('Ajax error');
-  });
-});
 
-  // --- 7) Assignment logic ---
+  document.getElementById('saveCostBtn').addEventListener('click', function() {
+    if (!currentTicketId) {
+      console.error('No ticket ID available');
+      alert('Error: No ticket selected');
+      return;
+    }
+    const cost = parseFloat(document.getElementById('totalCostInput').value) || 0;
+    fetch('update_cost.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ticket_id: currentTicketId, total_cost: cost})
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.success) return alert('Error: ' + d.error);
+      alert('Cost updated successfully');
+    })
+    .catch(err => {
+      console.error('Ajax error:', err);
+      alert('Ajax error');
+    });
+  });
+
   const btnA = document.getElementById('btnAssignTo');
   if (btnA) {
     btnA.addEventListener('click', () => {
@@ -565,25 +404,16 @@ document.getElementById('saveCostBtn').addEventListener('click', function() {
       .then(r=>r.json()).then(d=>{
         if (!d.success) return alert('Error: '+d.error);
         alert('Assigned to '+assignee);
-        applyFilterAndPaginate();
+        loadTickets(currentPage);
       })
       .catch(()=>alert('Ajax error'));
     });
   }
 });
 
-
-// Format currency to always show two decimal places
 function formatCurrency(input) {
-  // Get the value as a number
   let value = parseFloat(input.value);
-  
-  // If it's NaN (not a number), set to 0
-  if (isNaN(value)) {
-    value = 0;
-  }
-  
-  // Format to two decimal places
+  if (isNaN(value)) { value = 0; }
   input.value = value.toFixed(2);
 }
 
