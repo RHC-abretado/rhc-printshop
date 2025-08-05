@@ -8,6 +8,7 @@ if (!isset($_SESSION['logged_in'], $_SESSION['role']) || $_SESSION['role'] !== '
 }
 
 require_once 'assets/database.php';
+$protectedUsers = require __DIR__ . '/config/protected_users.php';
 
 if (empty($_GET['id'])) {
     die("No user specified.");
@@ -19,72 +20,76 @@ try {
     // use the shared $pdo from assets/database.php
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Handle form submission
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username  = trim($_POST['username'] ?? '');
-        $email     = trim($_POST['email'] ?? '');
-        $role      = trim($_POST['role'] ?? '');
-        $firstName = trim($_POST['first_name'] ?? '');
-        $lastName  = trim($_POST['last_name']  ?? '');
-        $password  = $_POST['password'] ?? '';
-
-        // Build SQL
-        $params = [
-            ':username'   => $username,
-            ':email'      => $email,
-            ':role'       => $role,
-            ':first_name' => $firstName,
-            ':last_name'  => $lastName,
-            ':id'         => $userId
-        ];
-        if ($password !== '') {
-            $params[':password_hash'] = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "UPDATE users 
-                       SET username        = :username,
-                           email           = :email,
-                           role            = :role,
-                           first_name      = :first_name,
-                           last_name       = :last_name,
-                           password_hash   = :password_hash
-                     WHERE id = :id";
-        } else {
-            $sql = "UPDATE users 
-                       SET username     = :username,
-                           email        = :email,
-                           role         = :role,
-                           first_name   = :first_name,
-                           last_name    = :last_name
-                     WHERE id = :id";
-        }
-
-        // Perform update
-        $pdo->prepare($sql)->execute($params);
-
-        // ── NEW: log the user update ───────────────────────────────
-        $actor   = $_SESSION['username'];
-        $details = "Edited user ID {$userId} ({$username})";
-        $log     = $pdo->prepare("
-          INSERT INTO activity_log (username, event, details)
-          VALUES (:actor, 'update_user', :details)
-        ");
-        $log->execute([
-          ':actor'   => $actor,
-          ':details' => $details,
-        ]);
-
-        $message = '<div class="alert alert-success">User updated successfully.</div>';
-    }
-
     // Fetch existing data
-    $stmt = $pdo->prepare("
-      SELECT username, email, role, first_name, last_name
-        FROM users
-       WHERE id = :id
-    ");
+    $stmt = $pdo->prepare("\n      SELECT username, email, role, first_name, last_name, protected\n        FROM users\n       WHERE id = :id\n    ");
     $stmt->execute([':id' => $userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
         die("User not found.");
+    }
+    $isProtected = (int)$user['protected'] === 1 || in_array($user['username'], $protectedUsers, true);
+
+    // Handle form submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($isProtected) {
+            $message = '<div class="alert alert-danger">Protected user cannot be modified.</div>';
+        } else {
+            $username  = trim($_POST['username'] ?? '');
+            $email     = trim($_POST['email'] ?? '');
+            $role      = trim($_POST['role'] ?? '');
+            $firstName = trim($_POST['first_name'] ?? '');
+            $lastName  = trim($_POST['last_name']  ?? '');
+            $password  = $_POST['password'] ?? '';
+
+            // Build SQL
+            $params = [
+                ':username'   => $username,
+                ':email'      => $email,
+                ':role'       => $role,
+                ':first_name' => $firstName,
+                ':last_name'  => $lastName,
+                ':id'         => $userId
+            ];
+            if ($password !== '') {
+                $params[':password_hash'] = password_hash($password, PASSWORD_DEFAULT);
+                $sql = "UPDATE users
+                           SET username        = :username,
+                               email           = :email,
+                               role            = :role,
+                               first_name      = :first_name,
+                               last_name       = :last_name,
+                               password_hash   = :password_hash
+                         WHERE id = :id";
+            } else {
+                $sql = "UPDATE users
+                           SET username     = :username,
+                               email        = :email,
+                               role         = :role,
+                               first_name   = :first_name,
+                               last_name    = :last_name
+                         WHERE id = :id";
+            }
+
+            // Perform update
+            $pdo->prepare($sql)->execute($params);
+
+            // ── NEW: log the user update ───────────────────────────────
+            $actor   = $_SESSION['username'];
+            $details = "Edited user ID {$userId} ({$username})";
+            $log     = $pdo->prepare("\n          INSERT INTO activity_log (username, event, details)\n          VALUES (:actor, 'update_user', :details)\n        ");
+            $log->execute([
+              ':actor'   => $actor,
+              ':details' => $details,
+            ]);
+
+            $message = '<div class="alert alert-success">User updated successfully.</div>';
+
+            // Refresh user data after update
+            $stmt = $pdo->prepare("\n              SELECT username, email, role, first_name, last_name, protected\n                FROM users\n               WHERE id = :id\n            ");
+            $stmt->execute([':id' => $userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $isProtected = (int)$user['protected'] === 1 || in_array($user['username'], $protectedUsers, true);
+        }
     }
 
 } catch (PDOException $e) {

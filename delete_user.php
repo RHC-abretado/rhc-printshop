@@ -11,6 +11,7 @@ if (
 }
 
 require_once __DIR__ . '/assets/database.php';
+$protectedUsers = require __DIR__ . '/config/protected_users.php';
 
 if (empty($_GET['id'])) {
     die("No user specified.");
@@ -18,22 +19,24 @@ if (empty($_GET['id'])) {
 $userId = (int) $_GET['id'];
 
 try {
-    // 1) Look up the username so we can log it
+    // 1) Look up the username and protected flag so we can log/check it
     $fetch = $pdo->prepare("
-      SELECT username 
-        FROM users 
-       WHERE id = :id 
+      SELECT username, protected
+        FROM users
+       WHERE id = :id
        LIMIT 1
     ");
     $fetch->execute([':id' => $userId]);
     $row = $fetch->fetch(PDO::FETCH_ASSOC);
-
+    if (!$row || (int)$row['protected'] === 1 || in_array($row['username'], $protectedUsers, true)) {
+        die("Cannot delete protected user.");
+    }
     // 2) Delete the user
     $del = $pdo->prepare("DELETE FROM users WHERE id = :id");
     $del->execute([':id' => $userId]);
 
     // 3) If deletion succeeded, write an activity_log entry
-    if ($del->rowCount() && $row) {
+    if ($del->rowCount()) {
         $usernameDeleted = $row['username'];
         $log = $pdo->prepare("
           INSERT INTO activity_log (username, event, details)
