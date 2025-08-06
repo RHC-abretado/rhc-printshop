@@ -48,13 +48,6 @@ if (!in_array($newStatus, $allowed, true)) {
 }
 
 try {
-    $pdo = new PDO(
-        "mysql:host=$dbHost;dbname=$dbName;charset=utf8",
-        $dbUser,
-        $dbPass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-
     // Build UPDATE statement + params
     if ($newStatus === 'Processing') {
         $sql = "
