@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let html = '';
     keysOrder.forEach(k => {
-      if (!data[k]) return;
+      if (data[k] === undefined || data[k] === null) return;
       if (k === 'file_path' && data.file_path) {
         const files = data.file_path.split(',');
         const links = files.map(fp => {
@@ -296,7 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('<br>');
         html += `<tr><th>${displayNames[k]}</th><td>${links}</td></tr>`;
       } else {
-        html += `<tr><th>${displayNames[k]}</th><td>${data[k]}</td></tr>`;
+        let value = data[k];
+        if (value === '') {
+          const numericFields = new Set(['pages_in_original', 'number_of_sets', 'total_cost']);
+          value = numericFields.has(k) ? '0' : 'N/A';
+        }
+        html += `<tr><th>${displayNames[k]}</th><td>${value}</td></tr>`;
       }
     });
     if (data.completed_at_raw) {
