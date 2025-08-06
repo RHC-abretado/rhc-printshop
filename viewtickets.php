@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tr = document.createElement('tr');
     tr.setAttribute('data-id', row.id);
     tr.setAttribute('data-status', row.ticket_status);
-    tr.setAttribute('data-ticket', JSON.stringify(row));
+    tr.setAttribute('data-ticket', encodeURIComponent(JSON.stringify(row)));
 
     const notesSnippet = row.admin_notes ? (row.admin_notes.length > 50 ? row.admin_notes.substring(0,50) + '...' : row.admin_notes) : '';
     tr.innerHTML = `
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <button type=\"button\" class=\"btn btn-sm btn-info\"
                   data-bs-toggle=\"modal\"
                   data-bs-target=\"#ticketModal\"
-                  data-ticket='${escapeHtml(JSON.stringify(row))}'>View</button>
+                  data-ticket='${encodeURIComponent(JSON.stringify(row))}'>View</button>
           <a href=\"print_preview.php?ticket=${encodeURIComponent(row.ticket_number)}\"
              target=\"_blank\" class=\"btn btn-sm btn-secondary\">Print</a>
         </div>
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   ticketModalEl.addEventListener('show.bs.modal', ev => {
     const btn  = ev.relatedTarget;
-    const data = JSON.parse(btn.getAttribute('data-ticket'));
+    const data = JSON.parse(decodeURIComponent(btn.getAttribute('data-ticket')));
     currentTicketId = data.id;
 
     fetch('activity.php', {
