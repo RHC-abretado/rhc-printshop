@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <button type=\"button\" class=\"btn btn-sm btn-info\"
                   data-bs-toggle=\"modal\"
                   data-bs-target=\"#ticketModal\"
-                  data-ticket='${encodeURIComponent(JSON.stringify(row))}'>View</button>
+                  data-ticket=\"${encodeURIComponent(JSON.stringify(row))}\">View</button>
           <a href=\"print_preview.php?ticket=${encodeURIComponent(row.ticket_number)}\"
              target=\"_blank\" class=\"btn btn-sm btn-secondary\">Print</a>
         </div>
