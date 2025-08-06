@@ -43,3 +43,5 @@ try {
     die('Database Connection Failed: ' . $e->getMessage());
 }
 
+return $pdo;
+

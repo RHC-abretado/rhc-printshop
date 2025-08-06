@@ -4,14 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'assets/database.php';
-
-try {
-    // Create a new PDO connection
-    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8", $dbUser, $dbPass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+if (!isset($pdo) || !($pdo instanceof PDO)) {
+    $pdo = require_once __DIR__ . '/assets/database.php';
 }
 
 // Fetch cache version for cache busting
