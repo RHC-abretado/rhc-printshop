@@ -48,11 +48,18 @@ $countStmt->execute($params);
 $total = (int)$countStmt->fetchColumn();
 $totalPages = (int)ceil($total / $size);
 
+// If payload size becomes an issue, consider moving the detailed field fetch
+// into a dedicated endpoint (e.g. get_ticket_details.php) that returns all
+// columns for a single ticket when needed.
 $sql = "SELECT id, ticket_number, ticket_status, created_at, date_wanted,
                job_title, first_name, last_name, admin_notes, assigned_to,
                department_name, email, phone, location_code, other_location_code,
                delivery_method, description, pages_in_original, number_of_sets,
-               completed_at, total_cost
+               page_layout, print_copies_in, other_print_copies, page_type,
+               other_page_type, paper_color, other_paper_color, color_requirement,
+               paper_size, other_paper_size, other_options, cut_paper,
+               separator_color, staple_location, fold_type, binding_type,
+               file_path, completed_at, total_cost
         FROM job_tickets $whereSql
         ORDER BY created_at DESC
         LIMIT :limit OFFSET :offset";
