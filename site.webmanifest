@@ -1,7 +1,7 @@
 {
-  "name": "RHC Print Shop",
-  "short_name": "PrintShop",
-  "description": "Submit and manage print requests for the RHC print shop.",
+  "name": "RHC Printshop",
+  "short_name": "Printshop",
+  "description": "Submit and manage print requests for the RHC printshop.",
   "start_url": "/",
   "scope": "/",
   "icons": [
