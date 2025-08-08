@@ -408,11 +408,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_email'])) {
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="user-tab" data-bs-toggle="tab" data-bs-target="#user" type="button" role="tab" aria-controls="user" aria-selected="false">
-        <i class="bi bi-people"></i> User Management
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
       <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="false">
         <i class="bi bi-database"></i> Data Management
       </button>
@@ -438,9 +433,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_email'])) {
       </a></li>
       <li><a class="dropdown-item" href="#" data-target="#email" data-icon="bi-envelope">
         <i class="bi bi-envelope"></i> Email Settings
-      </a></li>
-      <li><a class="dropdown-item" href="#" data-target="#user" data-icon="bi-people">
-        <i class="bi bi-people"></i> User Management
       </a></li>
       <li><a class="dropdown-item" href="#" data-target="#data" data-icon="bi-database">
         <i class="bi bi-database"></i> Data Management
@@ -1045,10 +1037,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_email'])) {
     </div>
   </div>
   
-  <!-- User Management Tab -->
-  <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
-    <iframe src="user_management.php" style="width:100%; height:80vh; border:0;" title="User Management"></iframe>
-  </div>
   
   <!-- Data Management Tab -->
   <div class="tab-pane fade" id="data" role="tabpanel" aria-labelledby="data-tab">
