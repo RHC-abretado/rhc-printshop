@@ -87,7 +87,8 @@ try {
     $stmt = $pdo->prepare("SELECT AVG(TIMESTAMPDIFF(SECOND, created_at, completed_at)) FROM job_tickets WHERE ticket_status='Complete' AND completed_at IS NOT NULL$userWhere");
     $stmt->execute($bind);
     $avgSeconds = $stmt->fetchColumn();
-    if ($avgSeconds) {
+    $avgSeconds = $avgSeconds !== false ? (int)round((float)$avgSeconds) : 0;
+    if ($avgSeconds > 0) {
         $days = intdiv($avgSeconds, 86400);
         $avgSeconds %= 86400;
         $hours = intdiv($avgSeconds, 3600);
