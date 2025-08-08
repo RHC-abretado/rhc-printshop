@@ -96,8 +96,8 @@ try {
   <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
-        <h6>Avg Completion (hrs)</h6>
-        <h3 id="avgHours">0</h3>
+        <h6>Avg Completion</h6>
+        <h3 id="avgCompletion">0</h3>
       </div>
     </div>
   </div>
@@ -143,7 +143,7 @@ function loadStats(user='') {
       document.getElementById('topColor').textContent = d.topColor;
       document.getElementById('topType').textContent = d.topType;
       document.getElementById('topSize').textContent = d.topSize;
-      document.querySelector('#avgHours').textContent = d.avgHours;
+      document.getElementById('avgCompletion').textContent = d.avgCompletion;
 
       if (!lineChart) {
         lineChart = new Chart(document.getElementById('lineChart'), {

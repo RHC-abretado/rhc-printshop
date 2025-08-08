@@ -83,11 +83,30 @@ try {
     $topType  = $topOne('page_type');
     $topSize  = $topOne('paper_size');
 
-    // Avg completion time (hours)
+    // Avg completion time
     $stmt = $pdo->prepare("SELECT AVG(TIMESTAMPDIFF(SECOND, created_at, completed_at)) FROM job_tickets WHERE ticket_status='Complete' AND completed_at IS NOT NULL$userWhere");
     $stmt->execute($bind);
     $avgSeconds = $stmt->fetchColumn();
-    $avgHours   = $avgSeconds ? round($avgSeconds / 3600, 1) : 0;
+    if ($avgSeconds) {
+        $days = intdiv($avgSeconds, 86400);
+        $avgSeconds %= 86400;
+        $hours = intdiv($avgSeconds, 3600);
+        $avgSeconds %= 3600;
+        $minutes = intdiv($avgSeconds, 60);
+        $parts = [];
+        if ($days > 0) {
+            $parts[] = "{$days}d";
+        }
+        if ($hours > 0) {
+            $parts[] = "{$hours}h";
+        }
+        if ($minutes > 0 || empty($parts)) {
+            $parts[] = "{$minutes}m";
+        }
+        $avgCompletion = implode(' ', $parts);
+    } else {
+        $avgCompletion = '0m';
+    }
 
     // Top departments
     $sql = "SELECT location_code, COUNT(*) AS cnt FROM job_tickets WHERE 1=1$userWhere GROUP BY location_code ORDER BY cnt DESC LIMIT 5";
@@ -112,7 +131,7 @@ try {
         'topColor'    => $topColor,
         'topType'     => $topType,
         'topSize'     => $topSize,
-        'avgHours'    => $avgHours,
+        'avgCompletion' => $avgCompletion,
         'deptLabels'  => $deptLabels,
         'deptCounts'  => $deptCounts,
     ]);
