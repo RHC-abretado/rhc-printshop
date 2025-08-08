@@ -59,17 +59,9 @@ try {
   <?php endforeach; ?>
 </div>
 
-<!-- 12‑Month Line Chart -->
-<div class="card mb-4">
-  <div class="card-header">Submissions (Last 12 Months)</div>
-  <div class="card-body">
-    <canvas id="lineChart"></canvas>
-  </div>
-</div>
-
-<!-- New Metric Cards -->
+<!-- Metric Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-md-3">
+  <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
         <h6>Avg Pages Per Ticket</h6>
@@ -77,7 +69,7 @@ try {
       </div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
         <h6>Top Paper Color</h6>
@@ -85,7 +77,7 @@ try {
       </div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
         <h6>Top Page Type</h6>
@@ -93,7 +85,7 @@ try {
       </div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
         <h6>Top Paper Size</h6>
@@ -101,11 +93,7 @@ try {
       </div>
     </div>
   </div>
-</div>
-
-<!-- Avg Completion Time & Dept Chart -->
-<div class="row g-3 mb-5">
-  <div class="col-md-3">
+  <div class="col-6 col-md-2">
     <div class="card text-center">
       <div class="card-body">
         <h6>Avg Completion (hrs)</h6>
@@ -113,7 +101,19 @@ try {
       </div>
     </div>
   </div>
-  <div class="col-md-9">
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Submissions (Last 12 Months)</div>
+      <div class="card-body">
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
     <div class="card">
       <div class="card-header">Top 5 by Department</div>
       <div class="card-body">
@@ -143,7 +143,7 @@ function loadStats(user='') {
       document.getElementById('topColor').textContent = d.topColor;
       document.getElementById('topType').textContent = d.topType;
       document.getElementById('topSize').textContent = d.topSize;
-      document.getElementById('avgHours').textContent = d.avgHours;
+      document.querySelector('#avgHours').textContent = d.avgHours;
 
       if (!lineChart) {
         lineChart = new Chart(document.getElementById('lineChart'), {
