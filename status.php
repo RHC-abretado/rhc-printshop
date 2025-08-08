@@ -86,20 +86,20 @@ function getLocationFromIP($ip) {
 $ticket = null;
 $error = '';
 $ticketNumber = trim($_GET['ticket'] ?? '');
+$token = trim($_GET['token'] ?? '');
 
-// If no ticket parameter provided, redirect to homepage
-if (empty($ticketNumber)) {
-    // Optional: Log the direct access attempt
+// Require both ticket number and valid token
+if (empty($ticketNumber) || empty($token) || !preg_match('/^[a-f0-9]{32}$/', $token)) {
     $username = $_SESSION['username'] ?? 'guest';
-$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-$ipAddress = getRealIpAddr();
-$location = getLocationFromIP($ipAddress);
-$details = "Direct access to status.php without ticket parameter\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
-    
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $ipAddress = getRealIpAddr();
+    $location = getLocationFromIP($ipAddress);
+    $details = "Missing parameters for status.php\nTicket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+
     try {
         $log = $pdo->prepare(
             "INSERT INTO activity_log (username, event, details)
-             VALUES (:u, 'direct_status_access', :d)"
+             VALUES (:u, 'status_token_missing', :d)"
         );
         $log->execute([
             ':u' => $username,
@@ -108,7 +108,7 @@ $details = "Direct access to status.php without ticket parameter\nIP: {$ipAddres
     } catch (PDOException $e) {
         // Silently fail if logging doesn't work
     }
-    
+
     header('Location: index.php');
     exit;
 }
@@ -116,11 +116,11 @@ require_once 'header.php';
 // Process the ticket parameter
 try {
     // Log the status check (use guest if not logged in) with IP, location, and user agent
-$username = $_SESSION['username'] ?? 'guest';
-$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-$ipAddress = getRealIpAddr();
-$location = getLocationFromIP($ipAddress);
-$details = "Ticket: {$ticketNumber}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+    $username = $_SESSION['username'] ?? 'guest';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $ipAddress = getRealIpAddr();
+    $location = getLocationFromIP($ipAddress);
+    $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
 
     $log = $pdo->prepare(
         "INSERT INTO activity_log (username, event, details)
@@ -133,16 +133,24 @@ $details = "Ticket: {$ticketNumber}\nIP: {$ipAddress}\nLocation: {$location}\nUs
 
     // Fetch the ticket
     $stmt = $pdo->prepare("
-        SELECT * 
-        FROM job_tickets 
-        WHERE ticket_number = :tn 
+        SELECT *
+        FROM job_tickets
+        WHERE ticket_number = :tn AND check_token = :token
         LIMIT 1
     ");
-    $stmt->execute([':tn' => $ticketNumber]);
+    $stmt->execute([':tn' => $ticketNumber, ':token' => $token]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$ticket) {
         $error = 'Ticket not found.';
+        $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+        $log = $pdo->prepare(
+            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'status_token_mismatch', :d)"
+        );
+        $log->execute([
+            ':u' => $username,
+            ':d' => $details
+        ]);
     }
 
 } catch (PDOException $e) {
