@@ -193,6 +193,18 @@ setInterval(updateTicketBadges, 30000);
   gtag('config', 'G-VC0R4BEX9B');
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('assets/service-worker.js')
+        .catch(function(err) {
+          console.error('Service worker registration failed:', err);
+        });
+    }
+  });
+</script>
+
 </head>
 
 <body class="bg-light">
