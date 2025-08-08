@@ -204,6 +204,7 @@ function formatFileSize($bytes) {
 }
 ?>
 
+<a href="settings.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Settings</a>
 <h1>Semester Cleanup - Manage Uploads</h1>
 
 <?= $message ?>

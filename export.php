@@ -141,6 +141,7 @@ if ($action === 'Export CSV') {
 require_once 'header.php';
 ?>
 
+<a href="settings.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Settings</a>
 <h1>Export Tickets</h1>
 <div class="card">
   <div class="card-header">Filter &amp; Export</div>

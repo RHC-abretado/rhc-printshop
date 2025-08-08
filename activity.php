@@ -56,6 +56,7 @@ require 'header.php';
 ?>
 
 <div class="container-fluid">
+  <a href="settings.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Settings</a>
   <h1>Activity History</h1>
 
   <!-- ── FILTER FORM ─────────────────────────────────────────────── -->
