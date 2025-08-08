@@ -144,6 +144,25 @@ if (empty($_GET['ticket_number'])) {
 
 $ticketNumber = trim($_GET['ticket_number']);
 
+// Require and validate token
+if (empty($_GET['token']) || !preg_match('/^[a-f0-9]{32}$/', $_GET['token'])) {
+    $username = $_SESSION['username'] ?? 'guest';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $ipAddress = getRealIpAddr();
+    $location = getLocationFromIP($ipAddress);
+    $details = "Ticket: {$ticketNumber}\nToken: " . ($_GET['token'] ?? 'missing') . "\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+    $log = $pdo->prepare(
+        "INSERT INTO activity_log (username, event, details) VALUES (:u, 'check_status_missing_token', :d)"
+    );
+    $log->execute([
+        ':u' => $username,
+        ':d' => $details
+    ]);
+    echo '<div class="alert alert-danger">Invalid request.</div>';
+    exit;
+}
+$token = trim($_GET['token']);
+
 
 // Validate ticket format: YYYYMMXXX (year + month + sequence)
 if (!preg_match('/^20[0-9]{2}(0[1-9]|1[0-2])[0-9]{3}$/', $ticketNumber)) {
@@ -165,7 +184,7 @@ $username = $_SESSION['username'] ?? 'guest';
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
 $ipAddress = getRealIpAddr();
 $location = getLocationFromIP($ipAddress);
-$details = "Ticket: {$ticketNumber}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+$details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
 
 $log = $pdo->prepare(
   "INSERT INTO activity_log (username, event, details)
@@ -178,12 +197,12 @@ $log->execute([
 
     // 6) Fetch the ticket
     $stmt = $pdo->prepare("
-      SELECT * 
-        FROM job_tickets 
-       WHERE ticket_number = :tn 
+      SELECT *
+        FROM job_tickets
+       WHERE ticket_number = :tn AND check_token = :token
        LIMIT 1
     ");
-    $stmt->execute([':tn' => $ticketNumber]);
+    $stmt->execute([':tn' => $ticketNumber, ':token' => $token]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($ticket) {
@@ -207,6 +226,18 @@ $log->execute([
         </div>
         <?php
     } else {
+        $username = $_SESSION['username'] ?? 'guest';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+        $ipAddress = getRealIpAddr();
+        $location = getLocationFromIP($ipAddress);
+        $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+        $log = $pdo->prepare(
+            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'check_status_token_mismatch', :d)"
+        );
+        $log->execute([
+            ':u' => $username,
+            ':d' => $details
+        ]);
         echo '<div class="alert alert-danger">Ticket not found.</div>';
     }
 

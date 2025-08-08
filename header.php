@@ -233,11 +233,6 @@ setInterval(updateTicketBadges, 30000);
     </a>
   </li>
   
-<li class="nav-item">
-  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#checkStatusModal">
-    <i class="bi bi-search" aria-hidden="true"></i> Check Status
-  </a>
-</li>
   
   <li class="nav-item">
     <a href="pricing.php" class="nav-link">
@@ -323,11 +318,6 @@ setInterval(updateTicketBadges, 30000);
     </a>
   </li>
   
-  <li class="nav-item">
-  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#checkStatusModal">
-    <i class="bi bi-search" aria-hidden="true"></i> Check Status
-  </a>
-</li>
   
   <li class="nav-item">
     <a href="pricing.php" class="nav-link">
@@ -367,145 +357,4 @@ setInterval(updateTicketBadges, 30000);
 
   <!-- Main Content Area -->
 <main id="main-content" class="content flex-grow-1 p-3">
-     <!-- Check Status Modal -->
-<div class="modal fade" id="checkStatusModal" tabindex="-1" aria-labelledby="checkStatusModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <p class="modal-title" id="checkStatusModalLabel">Check Ticket Status</p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          <span class="visually-hidden">Close</span>
-        </button>
-      </div>
-      <div class="modal-body">
-  <form id="checkStatusForm" action="check_status.php" method="get" class="row g-3">
-    <div class="col-12">
-  <label for="ticket_number" class="form-label">Ticket Number:</label>
-  <input type="text" class="form-control" name="ticket_number" id="ticket_number" required aria-describedby="ticketNumberHelp" pattern="[0-9]{9,15}" title="Please enter a valid ticket number">
-  <div id="ticketNumberHelp" class="form-text">Enter your ticket number to check its status</div>
-  <div class="invalid-feedback">Please enter a valid ticket number</div>
-  <input type="hidden" name="check_status_submit" value="1">
-</div>
-    <div class="col-12">
-      <label for="captcha_answer" class="form-label">What year did Río Hondo College officially open for instruction? (Anti-spam)</label>
-      <input type="number" class="form-control" name="captcha_answer" id="captcha_answer" required placeholder="YYYY">
-      <div class="form-text">Hint: The district was created in 1960</div>
-    </div>
-    <!-- Honeypot field (hidden from users, visible to bots) -->
-    <div style="position: absolute; left: -9999px;">
-      <input type="text" name="website" tabindex="-1" autocomplete="off">
-    </div>
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary w-100">Check Status</button>
-    </div>
-  </form>
-        <div id="ticketInfoContainer" class="mt-3"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
-// Wait for the DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-// Restrict ticket number input to numbers only
-const ticketInput = document.getElementById('ticket_number');
-if (ticketInput) {
-  // Set minimum length attribute
-  ticketInput.setAttribute('minlength', '9');
-  ticketInput.setAttribute('maxlength', '15');
-  
-  ticketInput.addEventListener('input', function(e) {
-    // Remove any non-digit characters
-    this.value = this.value.replace(/[^0-9]/g, '');
-    
-    // Visual feedback for length validation
-    const submitBtn = document.querySelector('#checkStatusForm button[type="submit"]');
-    if (this.value.length >= 9) {
-      this.classList.remove('is-invalid');
-      this.classList.add('is-valid');
-      if (submitBtn) submitBtn.disabled = false;
-    } else if (this.value.length > 0) {
-    // Only show invalid state if user has typed something
-    this.classList.remove('is-valid');
-    this.classList.add('is-invalid');
-    if (submitBtn) submitBtn.disabled = true;
-  } else {
-    // Field is empty, remove all validation classes
-    this.classList.remove('is-valid', 'is-invalid');
-    if (submitBtn) submitBtn.disabled = true;
-  }
-});
-  
-  ticketInput.addEventListener('keydown', function(e) {
-    // Allow: backspace, delete, tab, escape, enter
-    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
-        // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-        (e.keyCode === 65 && e.ctrlKey === true) ||
-        (e.keyCode === 67 && e.ctrlKey === true) ||
-        (e.keyCode === 86 && e.ctrlKey === true) ||
-        (e.keyCode === 88 && e.ctrlKey === true)) {
-      return;
-    }
-    // Ensure that it's a number and stop the keypress
-    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-      e.preventDefault();
-    }
-  });
-  
-  ticketInput.addEventListener('paste', function(e) {
-    // Handle paste events
-    e.preventDefault();
-    let paste = (e.clipboardData || window.clipboardData).getData('text');
-    // Only allow numbers
-    paste = paste.replace(/[^0-9]/g, '');
-    this.value = paste;
-    
-    // Trigger input validation
-    ticketInput.dispatchEvent(new Event('input'));
-  });
-  
-
-}
-  // Get the form element
-  const checkStatusForm = document.getElementById('checkStatusForm');
-  // Only proceed if the form exists on the page
-  if (checkStatusForm) {
-    checkStatusForm.addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  // Use FormData to capture all form fields (including honeypot)
-  const formData = new FormData(checkStatusForm);
-  
-  // Convert FormData to URLSearchParams for GET request
-  const params = new URLSearchParams(formData);
-  
-  // Show loading indicator
-  document.getElementById('ticketInfoContainer').innerHTML = 
-    '<div class="d-flex justify-content-center"><div class="spinner-border text-primary" role="status">' +
-    '<span class="visually-hidden">Loading...</span></div></div>';
-  
-  fetch('check_status.php?' + params.toString())
-    .then(response => {
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('Access forbidden');
-        }
-        throw new Error('Network response was not ok. Status: ' + response.status);
-      }
-      return response.text();
-    })
-    .then(html => {
-      document.getElementById('ticketInfoContainer').innerHTML = html;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      document.getElementById('ticketInfoContainer')
-        .innerHTML = '<div class="alert alert-danger">Error loading ticket information.</div>';
-    });
-});
-  }
-});
-</script>
   <div class="container-fluid">
-    
-

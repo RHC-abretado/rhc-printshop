@@ -263,12 +263,15 @@ $stmtSeq = $pdo->prepare($sqlSeq);
 $stmtSeq->execute([':prefix' => $prefix]);
 $lastSeq = $stmtSeq->fetchColumn() ?: '000';
 $ticketNumber = $prefix . str_pad((int)$lastSeq + 1, 3, '0', STR_PAD_LEFT);
+// Generate unique token for status checks
+$checkToken = bin2hex(random_bytes(16));
 
 // == STEP 4: Insert into database (including ticket_number) ==
 try {
     // Build the SQL. Note: We have removed the separator_color field.
     $sql = "INSERT INTO job_tickets (
                 ticket_number,
+                check_token,
                 first_name, last_name, department_name, email, phone, location_code,
                 date_wanted, delivery_method, job_title, description, pages_in_original,
                 file_path, number_of_sets, page_layout, print_copies_in,
@@ -287,6 +290,7 @@ try {
                 created_at
             ) VALUES (
                 :ticket_number,
+                :check_token,
                 :first_name, :last_name, :department_name, :email, :phone, :location_code,
                 :date_wanted, :delivery_method, :job_title, :description, :pages_in_original,
                 :file_path, :number_of_sets, :page_layout, :print_copies_in,
@@ -308,6 +312,7 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':ticket_number'       => $ticketNumber,
+        ':check_token'         => $checkToken,
         ':first_name'          => $firstName,
         ':last_name'           => $lastName,
         ':department_name'     => $departmentName,
@@ -462,8 +467,8 @@ $html = "
         
         <div style='background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;'>
             <h3 style='margin-top: 0; color: #1976d2;'>Ticket Information</h3>
-            <p><strong>Ticket Number:</strong> {$ticketData['ticket_number']} 
-               <a href='https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}' 
+            <p><strong>Ticket Number:</strong> {$ticketData['ticket_number']}
+               <a href='https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}'
                   style='color: #1976d2;'>(check status)</a></p>
             <p><strong>Submitted:</strong> " . date('m/d/Y g:i A') . "</p>
         </div>
@@ -582,6 +587,7 @@ Your print request has been successfully submitted to RHC Printshop.
 
 TICKET INFORMATION:
 Ticket Number: {$ticketData['ticket_number']}
+Status Link: https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}
 Submitted: " . date('m/d/Y g:i A') . "
 
 CONTACT INFORMATION:
@@ -707,6 +713,7 @@ if ($settings) {
     // Prepare complete ticket data for email
 $ticketData = [
     'ticket_number' => $ticketNumber,
+    'check_token' => $checkToken,
     'first_name' => $firstName,
     'last_name' => $lastName,
     'department_name' => $departmentName,
@@ -776,7 +783,8 @@ try {
 // on successful insert:
 $response['success']      = true;
 $response['ticketNumber'] = $ticketNumber;
-$response['message']      = 'Your order has been placed and Ticket number is #' . $ticketNumber . '. <br/>Please keep this ticket number for your records. You will receive an email once your project is assigned and processing.';
+$statusUrl = 'status.php?ticket=' . $ticketNumber . '&token=' . $checkToken;
+$response['message']      = 'Your order has been placed and Ticket number is #' . $ticketNumber . '. <br/>You can check the status at <a href="' . $statusUrl . '">' . $statusUrl . '</a>.<br/>Please keep this ticket number for your records. You will receive an email once your project is assigned and processing.';
 echo json_encode($response);
 exit;
 

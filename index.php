@@ -39,13 +39,6 @@
       </div>
       <div class="card-body">
         <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#checkStatusModal">
-            <i class="bi bi-search me-3 fs-4"></i>
-            <div>
-             <p class="mb-0">Check Status</p>
-              <small class="text-muted">Track the progress of your print job</small>
-            </div>
-          </a>
           <a href="pricing.php" class="list-group-item list-group-item-action d-flex align-items-center">
             <i class="bi bi-tag me-3 fs-4"></i>
             <div>
