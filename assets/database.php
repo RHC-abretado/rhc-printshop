@@ -40,7 +40,8 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 } catch (PDOException $e) {
-    die('Database Connection Failed: ' . $e->getMessage());
+    error_log('DB connection failed: ' . $e->getMessage(), 3, dirname(__DIR__, 2) . '/logs/db_error.log');
+    exit('Database connection error.');
 }
 
 return $pdo;
