@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify({ ticket_number: data.ticket_number })
     }).catch(() => {});
 
+    const numericFields = new Set(['pages_in_original', 'number_of_sets', 'total_cost']);
     let html = '';
     keysOrder.forEach(k => {
       if (data[k] === undefined || data[k] === null) return;
@@ -298,8 +299,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         let value = data[k];
         if (value === '') {
-          const numericFields = new Set(['pages_in_original', 'number_of_sets', 'total_cost']);
-          value = numericFields.has(k) ? '0' : 'N/A';
+          if (numericFields.has(k)) {
+            value = '0';
+          } else {
+            return; // Skip display of empty non-numeric fields
+          }
         }
         html += `<tr><th>${displayNames[k]}</th><td>${value}</td></tr>`;
       }
