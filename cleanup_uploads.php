@@ -1,5 +1,6 @@
 <?php
 // cleanup_uploads.php
+// Remove uploaded files while retaining ticket records for analytics.
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -1,5 +1,6 @@
 <?php
 // delete_tickets.php
+// Permanently remove a ticket and any files it references.
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
