@@ -58,30 +58,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         foreach ($tickets as &$ticket) {
             $ticket['files'] = [];
             $ticket['total_size'] = 0;
-            
+
             $filePaths = explode(',', $ticket['file_path']);
             foreach ($filePaths as $path) {
                 $path = trim($path);
-                if (empty($path)) continue;
-                
-                $fullPath = $uploadDir . basename($path);
+                if (empty($path)) {
+                    continue;
+                }
+
+                // Build the full path from the stored relative path
+                $relativePath = ltrim($path, '/');
+                $fullPath = __DIR__ . '/' . $relativePath;
+
                 if (file_exists($fullPath)) {
                     $size = filesize($fullPath);
                     $ticket['total_size'] += $size;
                     $totalSize += $size;
                     $fileCount++;
-                    
+
                     $ticket['files'][] = [
-                        'path' => $path,
-                        'name' => basename($path),
+                        'path' => $relativePath,
+                        'name' => basename($relativePath),
                         'size' => $size
                     ];
                 }
             }
-            
+
             // Format size for display
             $ticket['size_formatted'] = formatFileSize($ticket['total_size']);
         }
+        unset($ticket);
         
         // Get summary statistics
         $stats = [
