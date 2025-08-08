@@ -3,7 +3,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenvPath = dirname(__DIR__, 2);
+$dotenvPath = dirname(__DIR__, 1);
 if (file_exists($dotenvPath . '/.env')) {
     Dotenv\Dotenv::createImmutable($dotenvPath)->safeLoad();
 }
