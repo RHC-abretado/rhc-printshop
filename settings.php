@@ -1518,7 +1518,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const dropdownButton = document.getElementById('settingsDropdown');
   const dropdownItems = document.querySelectorAll('.dropdown-item[data-target]');
   const tabButtons = document.querySelectorAll('#settingsTabs button[data-bs-target]');
-  const tabPanes = document.querySelectorAll('.tab-pane');
+  const tabPanes = document.querySelectorAll('#settingsTabsContent .tab-pane');
   
   // Get the active section from localStorage
   const activeSection = localStorage.getItem('settingsActiveSection') || '#dashboard';
@@ -1618,7 +1618,7 @@ document.getElementById('viewLogsBtn').addEventListener('click', function() {
       const icon = systemDropdownItem.getAttribute('data-icon');
       
       // Show system section
-      const tabPanes = document.querySelectorAll('.tab-pane');
+      const tabPanes = document.querySelectorAll('#settingsTabsContent .tab-pane');
       tabPanes.forEach(pane => {
         pane.classList.remove('show', 'active');
       });
