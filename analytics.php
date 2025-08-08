@@ -31,6 +31,7 @@ try {
 }
 ?>
 
+<a href="settings.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Settings</a>
 <h1>Analytics</h1>
 
 <div class="row mb-4">

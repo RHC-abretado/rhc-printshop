@@ -83,6 +83,7 @@ function displayRole(string $r): string {
 require_once 'header.php';
 ?>
 
+<a href="settings.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Settings</a>
 <h1>User Management</h1>
 
 <?= $message ?>
