@@ -175,58 +175,82 @@ try {
             <div class="card-header">
                 <h4 class="mb-0">Ticket #<?= htmlspecialchars($ticket['ticket_number']) ?></h4>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Status:</strong> 
-                            <span class="badge bg-<?php 
-                                switch($ticket['ticket_status']) {
-                                    case 'New': echo 'secondary'; break;
-                                    case 'Processing': echo 'warning'; break;
-                                    case 'Complete': echo 'success'; break;
-                                    case 'Canceled': echo 'danger'; break;
-                                    default: echo 'secondary';
-                                }
-                            ?>"><?= htmlspecialchars($ticket['ticket_status']) ?></span>
-                        </p>
-                        <p><strong>Job Title:</strong> <?= htmlspecialchars($ticket['job_title']) ?></p>
-                        <p><strong>Request Date:</strong> <?= htmlspecialchars(toLA($ticket['created_at'], 'm/d/Y')) ?></p>
-                        <p><strong>Due Date:</strong> <?= htmlspecialchars(date('m/d/Y', strtotime($ticket['date_wanted']))) ?></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Requester:</strong> <?= htmlspecialchars($ticket['first_name'] . ' ' . $ticket['last_name']) ?></p>
-                        <p><strong>Department:</strong> <?= htmlspecialchars($ticket['department_name']) ?></p>
-                        <?php if (!empty($ticket['assigned_to'])): ?>
-                            <p><strong>Assigned To:</strong> <?= htmlspecialchars($ticket['assigned_to']) ?></p>
-                        <?php endif; ?>
-                        <?php if ($ticket['ticket_status'] === 'Complete' && !empty($ticket['completed_at'])): ?>
-                            <p><strong>Completed On:</strong> <?= htmlspecialchars(toLA($ticket['completed_at'], 'm/d/Y H:i:s')) ?></p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <?php if (!empty($ticket['description'])): ?>
-                    <hr>
-                    <p><strong>Instructions/Notes:</strong></p>
-                    <p><?= nl2br(htmlspecialchars($ticket['description'])) ?></p>
-                <?php endif; ?>
-                
-                <div class="mt-4">
-                    <p class="text-muted">
-                        <small>
-                            For questions about your order, please contact the printshop at
-                            <a href="mailto:printing@riohondo.edu">printing@riohondo.edu</a> or call (562) 908-3445.
-                        </small>
-                    </p>
-                </div>
+              <div class="card-body">
+                  <table class="table table-sm table-borderless mb-0">
+                      <tbody>
+                          <tr>
+                              <th scope="row">Status</th>
+                              <td>
+                                  <span class="badge bg-<?php
+                                      switch($ticket['ticket_status']) {
+                                          case 'New': echo 'secondary'; break;
+                                          case 'Processing': echo 'warning'; break;
+                                          case 'Complete': echo 'success'; break;
+                                          case 'Canceled': echo 'danger'; break;
+                                          default: echo 'secondary';
+                                      }
+                                  ?>"><?= htmlspecialchars($ticket['ticket_status']) ?></span>
+                              </td>
+                          </tr>
+                          <tr>
+                              <th scope="row">Job Title</th>
+                              <td><?= htmlspecialchars($ticket['job_title']) ?></td>
+                          </tr>
+                          <tr>
+                              <th scope="row">Request Date</th>
+                              <td><?= htmlspecialchars(toLA($ticket['created_at'], 'm/d/Y')) ?></td>
+                          </tr>
+                          <tr>
+                              <th scope="row">Due Date</th>
+                              <td><?= htmlspecialchars(date('m/d/Y', strtotime($ticket['date_wanted']))) ?></td>
+                          </tr>
+                      </tbody>
+                  </table>
 
-                <?php if ($emailToken): ?>
-                    <p class="mt-3">
-                        <a href="my_requests.php?email=<?= urlencode($ticket['email']) ?>&token=<?= htmlspecialchars($emailToken) ?>">View all your requests</a>
-                    </p>
-                <?php endif; ?>
-            </div>
-        </div>
+                  <div class="accordion mt-4" id="ticketDetails">
+                      <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingDetails">
+                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                                  View Ticket Details
+                              </button>
+                          </h2>
+                          <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#ticketDetails">
+                              <div class="accordion-body">
+                                  <dl class="row mb-0">
+                                      <dt class="col-sm-3">Requester</dt>
+                                      <dd class="col-sm-9"><?= htmlspecialchars($ticket['first_name'] . ' ' . $ticket['last_name']) ?></dd>
+                                      <dt class="col-sm-3">Department</dt>
+                                      <dd class="col-sm-9"><?= htmlspecialchars($ticket['department_name']) ?></dd>
+                                      <?php if (!empty($ticket['assigned_to'])): ?>
+                                          <dt class="col-sm-3">Assigned To</dt>
+                                          <dd class="col-sm-9"><?= htmlspecialchars($ticket['assigned_to']) ?></dd>
+                                      <?php endif; ?>
+                                      <?php if ($ticket['ticket_status'] === 'Complete' && !empty($ticket['completed_at'])): ?>
+                                          <dt class="col-sm-3">Completed On</dt>
+                                          <dd class="col-sm-9"><?= htmlspecialchars(toLA($ticket['completed_at'], 'm/d/Y H:i:s')) ?></dd>
+                                      <?php endif; ?>
+                                      <?php if (!empty($ticket['description'])): ?>
+                                          <dt class="col-sm-3">Instructions/Notes</dt>
+                                          <dd class="col-sm-9"><?= nl2br(htmlspecialchars($ticket['description'])) ?></dd>
+                                      <?php endif; ?>
+                                  </dl>
+                                  <div class="mt-3">
+                                      <p class="text-muted mb-2">
+                                          <small>
+                                              For questions about your order, please contact the printshop at
+                                              <a href="mailto:printing@riohondo.edu">printing@riohondo.edu</a> or call (562) 908-3445.
+                                          </small>
+                                      </p>
+                                      <?php if ($emailToken): ?>
+                                          <p class="mb-0"><a href="my_requests.php?email=<?= urlencode($ticket['email']) ?>&token=<?= htmlspecialchars($emailToken) ?>">View all your requests</a></p>
+                                      <?php endif; ?>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
         
     <?php elseif ($ticketNumber && $error): ?>
         <!-- Error Message -->
