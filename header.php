@@ -109,47 +109,49 @@ if (empty($_SESSION['form_token'])) {
   echo $pageTitle; 
 ?> - Río Hondo College</title>
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
 <!-- Your consolidated CSS with cache busting -->
   <?php
   $cacheVersion = $settings['cache_version'] ?? 1;
   ?>
-  <link href="assets/css/style.css?v=<?= $cacheVersion ?>" rel="stylesheet">
+  <link href="assets/css/style.css?v=<?= $cacheVersion ?>" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
   
   <!-- load SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script>
-// override the native alert() globally
-window.alert = function(msg) {
-  Swal.fire({
-    text: msg,
-    icon: 'info',
-    confirmButtonText: 'OK'
-  });
-};
+document.addEventListener('DOMContentLoaded', function() {
+  // override the native alert() globally
+  window.alert = function(msg) {
+    Swal.fire({
+      text: msg,
+      icon: 'info',
+      confirmButtonText: 'OK'
+    });
+  };
 
-// (optionally) override confirm() and prompt() too:
-window.confirm = function(msg) {
-  return Swal.fire({
-    text: msg,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Yes',
-    cancelButtonText: 'No'
-  }).then(result => result.isConfirmed);
-};
+  // (optionally) override confirm() and prompt() too:
+  window.confirm = function(msg) {
+    return Swal.fire({
+      text: msg,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No'
+    }).then(result => result.isConfirmed);
+  };
 
-window.prompt = function(msg, defaultVal = '') {
-  return Swal.fire({
-    title: msg,
-    input: 'text',
-    inputValue: defaultVal,
-    showCancelButton: true
-  }).then(result => result.isConfirmed ? result.value : null);
-};
+  window.prompt = function(msg, defaultVal = '') {
+    return Swal.fire({
+      title: msg,
+      input: 'text',
+      inputValue: defaultVal,
+      showCancelButton: true
+    }).then(result => result.isConfirmed ? result.value : null);
+  };
+});
 </script>
 
 <script>
