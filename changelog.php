@@ -17,9 +17,27 @@
   </section>
   
   <!-- Versions Section -->
-  <section id="changelog">
-    <h2>Versions</h2>
-    
+    <section id="changelog">
+      <h2>Versions</h2>
+
+<div class="card mb-3">
+  <div class="card-header">
+    Version 2.2 – Expanded Uploads, Revenue Insights &amp; Request Tracking (8/15/2025)
+  </div>
+  <div class="card-body">
+    <ul>
+      <li><strong>Expanded Upload Capacity:</strong> Raised limits to five files totaling 100&nbsp;MB and added PowerPoint (<code>.ppt/.pptx</code>) and Publisher (<code>.pub</code>) support.</li>
+      <li><strong>Accurate Cost Estimates:</strong> Refined pricing calculations for more reliable project quotes.</li>
+      <li><strong>Self-Service Request Tracking:</strong> Introduced token-secured <em>Check Status</em> and <em>My Requests</em> pages so requesters can review ticket details and history via emailed links.</li>
+      <li><strong>Environment-Based Configuration:</strong> Migrated database credentials to environment variables using Dotenv for safer, more flexible deployments.</li>
+      <li><strong>Revenue Analytics:</strong> Added monthly and quarterly revenue summaries in Settings with per-ticket averages.</li>
+      <li><strong>Enhanced Ticket Search:</strong> View Tickets page now filters by requester name, department, and location code.</li>
+      <li><strong>Maintenance Mode:</strong> Added toggleable maintenance mode with Super Admin bypass and customizable downtime message.</li>
+      <li><strong>Core Performance &amp; Security:</strong> Optimized core files, tightened input validation, and expanded activity logging for improved reliability.</li>
+    </ul>
+  </div>
+</div>
+
 <div class="card mb-3">
   <div class="card-header">
     Version 2.1 – Advanced Security, Auto-Assignment &amp; Database-Driven Pricing Management (7/10/2025)
