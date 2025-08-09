@@ -87,6 +87,12 @@ if (empty($_SESSION['form_token'])) {
     $_SESSION['form_token'] = bin2hex(random_bytes(32));
 }
 ?>
+<?php
+// Default meta tags with ability to override before including header
+$metaDescription = $metaDescription ?? 'Río Hondo College Printshop dashboard for submitting and managing print requests.';
+$metaKeywords = $metaKeywords ?? 'Río Hondo College, Printshop, printing services, print request, ticket management';
+$metaAuthor = $metaAuthor ?? 'Río Hondo College';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -94,6 +100,9 @@ if (empty($_SESSION['form_token'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="<?= htmlspecialchars($metaDescription) ?>">
+  <meta name="keywords" content="<?= htmlspecialchars($metaKeywords) ?>">
+  <meta name="author" content="<?= htmlspecialchars($metaAuthor) ?>">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
