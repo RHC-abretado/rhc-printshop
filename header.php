@@ -55,7 +55,7 @@ if (!isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
     }
 }
 
-// Check if current remember_me token is still valid (for cross-device logout)
+// Check if current remember_me token is still valid (for cross-device ut)
 if (isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
     try {
         $tokenCheck = $pdo->prepare("
@@ -271,10 +271,10 @@ setInterval(updateTicketBadges, 30000);
       <?php endif; ?>
     <?php endif; ?>
 
-    <!-- Always show Logout when logged in -->
+    <!-- Always show ut when logged in -->
     <li class="nav-item">
-      <a href="logout.php" class="nav-link">
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
+      <a href="ut.php" class="nav-link">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> ut
       </a>
     </li>
   <?php endif; ?>
@@ -297,7 +297,7 @@ setInterval(updateTicketBadges, 30000);
   <!-- Sidebar for Larger Screens -->
   <nav class="sidebar d-none d-md-block p-3">
     <a href="index.php" class="navbar-brand">
-      <img class="logo" src="https://www.riohondo.edu/wp-content/uploads/2024/12/RioHondo-Seal-Light.png" 
+      <img class="logo" src="./assets/RioHondo-Seal-Light.png" 
            alt="Río Hondo College Printshop">
     </a>
     <hr>
