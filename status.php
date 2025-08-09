@@ -175,7 +175,7 @@ try {
             <div class="card-header">
                 <h4 class="mb-0">Ticket #<?= htmlspecialchars($ticket['ticket_number']) ?></h4>
             </div>
-              <div class="card-body">
+ <div class="card-body">
                   <table class="table table-sm table-borderless mb-0">
                       <tbody>
                           <tr>
@@ -216,24 +216,108 @@ try {
                           </h2>
                           <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#ticketDetails">
                               <div class="accordion-body">
-                                  <dl class="row mb-0">
-                                      <dt class="col-sm-3">Requester</dt>
-                                      <dd class="col-sm-9"><?= htmlspecialchars($ticket['first_name'] . ' ' . $ticket['last_name']) ?></dd>
-                                      <dt class="col-sm-3">Department</dt>
-                                      <dd class="col-sm-9"><?= htmlspecialchars($ticket['department_name']) ?></dd>
-                                      <?php if (!empty($ticket['assigned_to'])): ?>
-                                          <dt class="col-sm-3">Assigned To</dt>
-                                          <dd class="col-sm-9"><?= htmlspecialchars($ticket['assigned_to']) ?></dd>
-                                      <?php endif; ?>
-                                      <?php if ($ticket['ticket_status'] === 'Complete' && !empty($ticket['completed_at'])): ?>
-                                          <dt class="col-sm-3">Completed On</dt>
-                                          <dd class="col-sm-9"><?= htmlspecialchars(toLA($ticket['completed_at'], 'm/d/Y H:i:s')) ?></dd>
-                                      <?php endif; ?>
-                                      <?php if (!empty($ticket['description'])): ?>
-                                          <dt class="col-sm-3">Instructions/Notes</dt>
-                                          <dd class="col-sm-9"><?= nl2br(htmlspecialchars($ticket['description'])) ?></dd>
-                                      <?php endif; ?>
-                                  </dl>
+                                  <?php
+                                  $displayNames = [
+                                      'ticket_number'      => 'Ticket #',
+                                      'ticket_status'      => 'Status',
+                                      'first_name'         => 'First Name',
+                                      'last_name'          => 'Last Name',
+                                      'department_name'    => 'Department',
+                                      'email'              => 'Email',
+                                      'phone'              => 'Phone',
+                                      'location_code'      => 'Location',
+                                      'other_location_code'=> 'Other Location',
+                                      'date_wanted'        => 'Due Date',
+                                      'delivery_method'    => 'Delivery',
+                                      'job_title'          => 'Title',
+                                      'description'        => 'Instructions/Notes',
+                                      'pages_in_original'  => 'Pages',
+                                      'number_of_sets'     => 'Sets',
+                                      'page_layout'        => 'Layout',
+                                      'print_copies_in'    => 'Print In',
+                                      'other_print_copies' => 'Other Copies',
+                                      'page_type'          => 'Page Type',
+                                      'other_page_type'    => 'Other Type',
+                                      'paper_color'        => 'Color',
+                                      'other_paper_color'  => 'Other Color',
+                                      'color_requirement'  => 'Color Req',
+                                      'paper_size'         => 'Size',
+                                      'other_paper_size'   => 'Other Size',
+                                      'other_options'      => 'Options',
+                                      'cut_paper'          => 'Cut Paper',
+                                      'separator_color'    => 'Separator',
+                                      'staple_location'    => 'Staple',
+                                      'fold_type'          => 'Fold',
+                                      'binding_type'       => 'Binding',
+                                      'created_at'         => 'Request Date',
+                                      'file_path'          => 'File',
+                                      'assigned_to'        => 'Assigned To',
+                                      'total_cost'         => 'Total Cost'
+                                  ];
+
+                                  $keysOrder = [
+                                      'ticket_number','ticket_status','first_name','last_name','department_name',
+                                      'email','phone','location_code','other_location_code','date_wanted',
+                                      'delivery_method','job_title','description','pages_in_original',
+                                      'number_of_sets','page_layout','print_copies_in','other_print_copies',
+                                      'page_type','other_page_type','paper_color','other_paper_color',
+                                      'color_requirement','paper_size','other_paper_size','other_options',
+                                      'cut_paper','separator_color','staple_location','fold_type','binding_type',
+                                      'created_at','file_path','assigned_to','total_cost'
+                                  ];
+
+                                  $numericFields = ['pages_in_original','number_of_sets','total_cost'];
+
+                                  echo '<table class="table table-sm mb-0"><tbody>';
+                                  foreach ($keysOrder as $key) {
+                                      if (!isset($ticket[$key]) || $ticket[$key] === '') {
+                                          if (in_array($key, $numericFields, true)) {
+                                              $value = '0';
+                                          } else {
+                                              continue;
+                                          }
+                                      } else {
+                                          $value = $ticket[$key];
+                                      }
+
+                                      switch ($key) {
+                                          case 'date_wanted':
+                                              $value = htmlspecialchars(date('m/d/Y', strtotime($value)));
+                                              break;
+                                          case 'created_at':
+                                              $value = htmlspecialchars(toLA($value, 'm/d/Y H:i:s'));
+                                              break;
+                                          case 'file_path':
+                                              $files = array_filter(array_map('trim', explode(',', $value)));
+                                              $links = [];
+                                              foreach ($files as $fp) {
+                                                  $links[] = '<a href="' . htmlspecialchars($fp) . '" target="_blank">' . htmlspecialchars(basename($fp)) . '</a>';
+                                              }
+                                              $value = implode('<br>', $links);
+                                              break;
+                                          case 'total_cost':
+                                              $value = '$' . number_format((float)$value, 2);
+                                              $value = htmlspecialchars($value);
+                                              break;
+                                          default:
+                                              $value = htmlspecialchars($value);
+                                      }
+
+                                      echo '<tr><th>' . $displayNames[$key] . '</th><td>' . $value . '</td></tr>';
+                                  }
+
+                                  if (!empty($ticket['completed_at'])) {
+                                      $completed = toLA($ticket['completed_at'], 'm/d/Y H:i:s');
+                                      echo '<tr><th>Completed On</th><td>' . htmlspecialchars($completed) . '</td></tr>';
+                                      $start = new DateTime($ticket['created_at']);
+                                      $end = new DateTime($ticket['completed_at']);
+                                      $interval = $start->diff($end);
+                                      $turnaround = $interval->days . 'd ' . $interval->h . 'h ' . $interval->i . 'm';
+                                      echo '<tr><th>Turnaround Time</th><td>' . $turnaround . '</td></tr>';
+                                  }
+
+                                  echo '</tbody></table>';
+                                  ?>
                                   <div class="mt-3">
                                       <p class="text-muted mb-2">
                                           <small>
@@ -245,8 +329,7 @@ try {
                                           <p class="mb-0"><a href="my_requests.php?email=<?= urlencode($ticket['email']) ?>&token=<?= htmlspecialchars($emailToken) ?>">View all your requests</a></p>
                                       <?php endif; ?>
                                   </div>
-                              </div>
-                          </div>
+                              </div>                          </div>
                       </div>
                   </div>
               </div>
