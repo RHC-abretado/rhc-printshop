@@ -4,7 +4,7 @@
 </main>
 <!-- Footer Section -->
 <footer class="bg-dark text-white text-center py-3">
-  <p class="mb-0">&copy; Copyright <?php echo date('Y'); ?> - <a href="https://www.deviant.media" target="_blank" >Deviant Media LLC</a>. All Rights Reserved. <br>Version 2.1 | <a href="changelog.php">View Changelog</a><?php if (empty($_SESSION['logged_in'])): ?>
+  <p class="mb-0">&copy; Copyright <?php echo date('Y'); ?> - <a href="https://www.deviant.media" target="_blank" >Deviant Media LLC</a>. All Rights Reserved. <br>Version 2.2 | <a href="changelog.php">View Changelog</a><?php if (empty($_SESSION['logged_in'])): ?>
       | <a href="login.php">Admin Login</a>
     <?php endif; ?></p>
 </footer>
