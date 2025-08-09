@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$pdo = require_once __DIR__ . '/assets/database.php';
+require_once __DIR__ . '/assets/database.php';
 
 $email = trim($_GET['email'] ?? '');
 $token = trim($_GET['token'] ?? '');
