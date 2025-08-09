@@ -85,6 +85,7 @@ function getLocationFromIP($ip) {
 
 $ticket = null;
 $error = '';
+$emailToken = '';
 $ticketNumber = trim($_GET['ticket'] ?? '');
 $token = trim($_GET['token'] ?? '');
 
@@ -151,6 +152,12 @@ try {
             ':u' => $username,
             ':d' => $details
         ]);
+    } else {
+        if (!empty($ticket['email'])) {
+            $etStmt = $pdo->prepare("SELECT token FROM requestor_token WHERE email = :email");
+            $etStmt->execute([':email' => $ticket['email']]);
+            $emailToken = $etStmt->fetchColumn() ?: '';
+        }
     }
 
 } catch (PDOException $e) {
@@ -207,11 +214,17 @@ try {
                 <div class="mt-4">
                     <p class="text-muted">
                         <small>
-                            For questions about your order, please contact the printshop at 
+                            For questions about your order, please contact the printshop at
                             <a href="mailto:printing@riohondo.edu">printing@riohondo.edu</a> or call (562) 908-3445.
                         </small>
                     </p>
                 </div>
+
+                <?php if ($emailToken): ?>
+                    <p class="mt-3">
+                        <a href="my_requests.php?email=<?= urlencode($ticket['email']) ?>&token=<?= htmlspecialchars($emailToken) ?>">View all your requests</a>
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
         
