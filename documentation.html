@@ -541,7 +541,7 @@
                                 <i class="bi bi-gear-fill me-3"></i>
                                 Core Application Files
                             </h2>
-                            <span class="category-count">12 files</span>
+                            <span class="category-count">9 files</span>
                         </div>
                         <p class="text-muted mb-0">Primary user-facing pages that handle core functionality and user interactions</p>
                     </div>
@@ -656,6 +656,26 @@
                     </div>
 
                     <div class="file-item">
+                        <h5 class="file-name">my_requests.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-clock-history"></i> Request History
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-link-45deg"></i> Token-Based Access
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Allows requesters to review their past submissions</p>
+                        <div class="feature-list">
+                            <ul>
+                                <li>Email and token validation</li>
+                                <li>Tabular display of ticket details</li>
+                                <li>Links to individual status pages</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="file-item">
                         <h5 class="file-name">login.php</h5>
                         <div class="file-meta">
                             <span class="meta-badge purpose">
@@ -677,7 +697,6 @@
                         </div>
                     </div>
 
-                    <!-- Continue with other core files... -->
                     <div class="file-item">
                         <h5 class="file-name">my_account.php</h5>
                         <div class="file-meta">
@@ -730,7 +749,7 @@
                                 <i class="bi bi-shield-lock-fill me-3"></i>
                                 Admin Management Files
                             </h2>
-                            <span class="category-count">10 files</span>
+                            <span class="category-count">4 files</span>
                         </div>
                         <p class="text-muted mb-0">Administrative interfaces and management tools for system control</p>
                     </div>
@@ -780,7 +799,6 @@
                         </div>
                     </div>
 
-                    <!-- Continue with other admin files briefly -->
                     <div class="file-item">
                         <h5 class="file-name">user_management.php</h5>
                         <div class="file-meta">
@@ -843,6 +861,38 @@
                     </div>
 
                     <div class="file-item">
+                        <h5 class="file-name">update_cost.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-cash-stack"></i> Cost Updates
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Admin+ Only
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Response
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Modify ticket pricing with activity logging</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">update_notes.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-journal-text"></i> Notes Management
+                            </span>
+                            <span class="meta-badge access">
+                                <i class="bi bi-shield"></i> Admin+ Only
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Response
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Update internal ticket notes via AJAX</p>
+                    </div>
+
+                    <div class="file-item">
                         <h5 class="file-name">assign_ticket.php</h5>
                         <div class="file-meta">
                             <span class="meta-badge purpose">
@@ -856,6 +906,19 @@
                     </div>
 
                     <div class="file-item">
+                        <h5 class="file-name">get_tickets.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-list-ul"></i> Ticket Retrieval
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> Paginated JSON
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Fetch tickets with search, filter, and pagination</p>
+                    </div>
+
+                    <div class="file-item">
                         <h5 class="file-name">get_ticket_count.php</h5>
                         <div class="file-meta">
                             <span class="meta-badge purpose">
@@ -866,6 +929,32 @@
                             </span>
                         </div>
                         <p><strong>Primary Function:</strong> Real-time notification badge updates</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">mark_tickets_viewed.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-eye"></i> Activity Tracking
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Response
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Record when users view their ticket queue</p>
+                    </div>
+
+                    <div class="file-item">
+                        <h5 class="file-name">get_analytics_stats.php</h5>
+                        <div class="file-meta">
+                            <span class="meta-badge purpose">
+                                <i class="bi bi-graph-up-arrow"></i> Analytics Data
+                            </span>
+                            <span class="meta-badge returns">
+                                <i class="bi bi-filetype-json"></i> JSON Stats
+                            </span>
+                        </div>
+                        <p><strong>Primary Function:</strong> Provide statistical data for dashboards</p>
                     </div>
                 </section>
 
