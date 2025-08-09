@@ -55,7 +55,7 @@ if (!isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
     }
 }
 
-// Check if current remember_me token is still valid (for cross-device ut)
+// Check if current remember_me token is still valid (for cross-device logout)
 if (isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
     try {
         $tokenCheck = $pdo->prepare("
@@ -94,13 +94,13 @@ if (empty($_SESSION['form_token'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon-16x16.png">
      <link rel="manifest" href="./site.webmanifest">
-  <title><?php
+  <title><?php 
   $pageTitle = 'Printshop Dashboard';
   if (basename($_SERVER['PHP_SELF']) === 'newticket.php') $pageTitle = 'Submit Print Request';
   elseif (basename($_SERVER['PHP_SELF']) === 'viewtickets.php') $pageTitle = 'View Tickets';
@@ -109,49 +109,47 @@ if (empty($_SESSION['form_token'])) {
   echo $pageTitle; 
 ?> - Río Hondo College</title>
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 
 <!-- Your consolidated CSS with cache busting -->
   <?php
   $cacheVersion = $settings['cache_version'] ?? 1;
   ?>
-  <link href="assets/css/style.css?v=<?= $cacheVersion ?>" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link href="assets/css/style.css?v=<?= $cacheVersion ?>" rel="stylesheet">
   
   <!-- load SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // override the native alert() globally
-  window.alert = function(msg) {
-    Swal.fire({
-      text: msg,
-      icon: 'info',
-      confirmButtonText: 'OK'
-    });
-  };
+// override the native alert() globally
+window.alert = function(msg) {
+  Swal.fire({
+    text: msg,
+    icon: 'info',
+    confirmButtonText: 'OK'
+  });
+};
 
-  // (optionally) override confirm() and prompt() too:
-  window.confirm = function(msg) {
-    return Swal.fire({
-      text: msg,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'No'
-    }).then(result => result.isConfirmed);
-  };
+// (optionally) override confirm() and prompt() too:
+window.confirm = function(msg) {
+  return Swal.fire({
+    text: msg,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+  }).then(result => result.isConfirmed);
+};
 
-  window.prompt = function(msg, defaultVal = '') {
-    return Swal.fire({
-      title: msg,
-      input: 'text',
-      inputValue: defaultVal,
-      showCancelButton: true
-    }).then(result => result.isConfirmed ? result.value : null);
-  };
-});
+window.prompt = function(msg, defaultVal = '') {
+  return Swal.fire({
+    title: msg,
+    input: 'text',
+    inputValue: defaultVal,
+    showCancelButton: true
+  }).then(result => result.isConfirmed ? result.value : null);
+};
 </script>
 
 <script>
@@ -275,10 +273,10 @@ setInterval(updateTicketBadges, 30000);
       <?php endif; ?>
     <?php endif; ?>
 
-    <!-- Always show ut when logged in -->
+    <!-- Always show Logout when logged in -->
     <li class="nav-item">
-      <a href="ut.php" class="nav-link">
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> ut
+      <a href="logout.php" class="nav-link">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
       </a>
     </li>
   <?php endif; ?>
@@ -301,7 +299,7 @@ setInterval(updateTicketBadges, 30000);
   <!-- Sidebar for Larger Screens -->
   <nav class="sidebar d-none d-md-block p-3">
     <a href="index.php" class="navbar-brand">
-      <img class="logo" src="./assets/RioHondo-Seal-Light.png" 
+      <img class="logo" src="./assets/RioHondo-Seal-Light.webp" 
            alt="Río Hondo College Printshop">
     </a>
     <hr>
