@@ -72,7 +72,7 @@
     Copyright Laws
   </div>
   <div class="card-body">
-    <h6>Summary of Civil and Criminal Penalties for Violation of Federal Copyright Laws</h6>
+    <strong>Summary of Civil and Criminal Penalties for Violation of Federal Copyright Laws</strong>
     <p>Copyright infringement is the act of exercising, without permission or legal authority, one or more of the exclusive rights granted to the copyright owner under section 106 of the Copyright Act (Title 17 of the United States Code). These rights include the right to reproduce or distribute a copyrighted work. In the file sharing context, downloading or uploading substantial parts of a copyrighted work without authority constitutes an infringement.</p>
     
     <p>Penalties for copyright infringement include civil and criminal penalties. In general, anyone found liable for civil copyright infringement may be ordered to pay either actual damages or "statutory" damages affixed at not less than $750 and not more than $30,000 per work infringed. For "willful" infringement, a court may award up to $150,000 per work infringed. A court can, in its discretion, also assess costs and attorneys' fees.</p>
