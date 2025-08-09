@@ -54,6 +54,28 @@ $departmentName = trim($_POST['department_name'] ?? '');
 $email          = trim($_POST['email'] ?? '');
 $phone          = trim($_POST['phone'] ?? '');
 
+// Generate or reuse persistent token for requestor email
+$emailToken = '';
+if (!empty($email)) {
+    try {
+        $tokenStmt = $pdo->prepare("SELECT token FROM requestor_token WHERE email = :email");
+        $tokenStmt->execute([':email' => $email]);
+        $emailToken = $tokenStmt->fetchColumn();
+
+        if (!$emailToken) {
+            $emailToken = bin2hex(random_bytes(16));
+            $insertToken = $pdo->prepare(
+                "INSERT INTO requestor_token (email, token, created_at)
+                 VALUES (:email, :token, NOW())"
+            );
+            $insertToken->execute([':email' => $email, ':token' => $emailToken]);
+        }
+    } catch (PDOException $e) {
+        // Fail silently if token logic fails
+        $emailToken = '';
+    }
+}
+
 // LOCATION CODE
 $locationSelect = trim($_POST['location_code_select'] ?? '');
 $otherLoc       = trim($_POST['other_location_code'] ?? '');
@@ -459,6 +481,7 @@ if (empty($ticketData['email'])) {
 }
 
 // Build comprehensive HTML message
+$historyUrl = 'https://printing.riohondo.edu/my_requests.php?email=' . urlencode($ticketData['email']) . '&token=' . $ticketData['email_token'];
 $html = "
 <div style='font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; background: #f8f9fa; padding: 20px;'>
     <div style='background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
@@ -571,7 +594,9 @@ if (!empty($ticketData['total_cost']) && $ticketData['total_cost'] > 0) {
 $html .= "
         </table>
 
-        <p style='margin-top: 30px;'>Please save this ticket number for your records. You will receive another email 
+        <p style='margin-top: 20px;'><a href='{$historyUrl}' style='color: #1976d2;'>View all your requests</a></p>
+
+        <p style='margin-top: 30px;'>Please save this ticket number for your records. You will receive another email
         when your project begins processing and when it is complete.</p>
         <p>If you have any questions, please email <a href='mailto:printing@riohondo.edu' style='color: #2a6491;'>printing@riohondo.edu</a>.</p>
         <p style='font-size: 12px; color: #666; margin-bottom: 0;'>This is an automated message, please do not reply to this email.</p>
@@ -588,6 +613,7 @@ Your print request has been successfully submitted to RHC Printshop.
 TICKET INFORMATION:
 Ticket Number: {$ticketData['ticket_number']}
 Status Link: https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}
+History Link: {$historyUrl}
 Submitted: " . date('m/d/Y g:i A') . "
 
 CONTACT INFORMATION:
@@ -737,7 +763,8 @@ $ticketData = [
     'fold_type' => $foldType,
     'binding_type' => $bindingType,
     'color_requirement' => $colorRequirement,
-    'total_cost' => $estimatedCost
+    'total_cost' => $estimatedCost,
+    'email_token' => $emailToken
 ];
 
 sendRequesterNotification($ticketData, $settings);
