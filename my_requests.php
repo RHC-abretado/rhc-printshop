@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$pdo = require_once __DIR__ . '/assets/database.php';
+require_once __DIR__ . '/assets/database.php';
 
 $email = trim($_GET['email'] ?? '');
 $token = trim($_GET['token'] ?? '');
@@ -17,7 +17,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/^[a-f0-9]{32}$/'
         $stmt = $pdo->prepare("SELECT token FROM requestor_token WHERE email = :email AND token = :token");
         $stmt->execute([':email' => $email, ':token' => $token]);
         if ($stmt->fetchColumn()) {
-            $ticketStmt = $pdo->prepare("SELECT ticket_number, check_token, ticket_status, created_at, date_wanted, job_title FROM job_tickets WHERE email = :email ORDER BY created_at DESC");
+            $ticketStmt = $pdo->prepare("SELECT ticket_number, check_token, created_at, date_wanted, job_title, assigned_to, admin_notes FROM job_tickets WHERE email = :email ORDER BY created_at DESC");
             $ticketStmt->execute([':email' => $email]);
             $tickets = $ticketStmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
@@ -42,10 +42,11 @@ require_once 'header.php';
                 <thead class="table-light">
                     <tr>
                         <th>Ticket #</th>
-                        <th>Status</th>
                         <th>Request Date</th>
                         <th>Due Date</th>
                         <th>Title</th>
+                        <th>Assigned To</th>
+                        <th>Notes</th>
                         <th>View</th>
                     </tr>
                 </thead>
@@ -53,10 +54,11 @@ require_once 'header.php';
                     <?php foreach ($tickets as $t): ?>
                         <tr>
                             <td><?= htmlspecialchars($t['ticket_number']) ?></td>
-                            <td><?= htmlspecialchars($t['ticket_status']) ?></td>
                             <td><?= htmlspecialchars(toLA($t['created_at'], 'm/d/Y')) ?></td>
                             <td><?= htmlspecialchars(date('m/d/Y', strtotime($t['date_wanted']))) ?></td>
                             <td><?= htmlspecialchars($t['job_title']) ?></td>
+                            <td><?= htmlspecialchars($t['assigned_to'] ?? '') ?></td>
+                            <td><?php $n = $t['admin_notes'] ?? ''; echo htmlspecialchars(strlen($n) > 50 ? substr($n, 0, 50) . '...' : $n); ?></td>
                             <td><a href="status.php?ticket=<?= urlencode($t['ticket_number']) ?>&token=<?= urlencode($t['check_token']) ?>">View</a></td>
                         </tr>
                     <?php endforeach; ?>
