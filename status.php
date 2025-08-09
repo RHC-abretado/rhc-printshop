@@ -250,7 +250,6 @@ try {
                                       'fold_type'          => 'Fold',
                                       'binding_type'       => 'Binding',
                                       'created_at'         => 'Request Date',
-                                      'file_path'          => 'File',
                                       'assigned_to'        => 'Assigned To',
                                       'total_cost'         => 'Total Cost'
                                   ];
@@ -263,7 +262,7 @@ try {
                                       'page_type','other_page_type','paper_color','other_paper_color',
                                       'color_requirement','paper_size','other_paper_size','other_options',
                                       'cut_paper','separator_color','staple_location','fold_type','binding_type',
-                                      'created_at','file_path','assigned_to','total_cost'
+                                      'created_at','assigned_to','total_cost'
                                   ];
 
                                   $numericFields = ['pages_in_original','number_of_sets','total_cost'];
@@ -287,14 +286,6 @@ try {
                                           case 'created_at':
                                               $value = htmlspecialchars(toLA($value, 'm/d/Y H:i:s'));
                                               break;
-                                          case 'file_path':
-                                              $files = array_filter(array_map('trim', explode(',', $value)));
-                                              $links = [];
-                                              foreach ($files as $fp) {
-                                                  $links[] = '<a href="' . htmlspecialchars($fp) . '" target="_blank">' . htmlspecialchars(basename($fp)) . '</a>';
-                                              }
-                                              $value = implode('<br>', $links);
-                                              break;
                                           case 'total_cost':
                                               $value = '$' . number_format((float)$value, 2);
                                               $value = htmlspecialchars($value);
@@ -304,16 +295,6 @@ try {
                                       }
 
                                       echo '<tr><th>' . $displayNames[$key] . '</th><td>' . $value . '</td></tr>';
-                                  }
-
-                                  if (!empty($ticket['completed_at'])) {
-                                      $completed = toLA($ticket['completed_at'], 'm/d/Y H:i:s');
-                                      echo '<tr><th>Completed On</th><td>' . htmlspecialchars($completed) . '</td></tr>';
-                                      $start = new DateTime($ticket['created_at']);
-                                      $end = new DateTime($ticket['completed_at']);
-                                      $interval = $start->diff($end);
-                                      $turnaround = $interval->days . 'd ' . $interval->h . 'h ' . $interval->i . 'm';
-                                      echo '<tr><th>Turnaround Time</th><td>' . $turnaround . '</td></tr>';
                                   }
 
                                   echo '</tbody></table>';
