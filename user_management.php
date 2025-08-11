@@ -157,6 +157,12 @@ require_once 'header.php';
                      onclick="return confirm('Delete <?= htmlspecialchars($u['username']) ?>?');">
                     <i class="bi bi-trash"></i>
                   </a>
+                  <?php if (in_array($_SESSION['username'], $protectedUsers, true)): ?>
+                  <a href="impersonate_user.php?target=<?= urlencode($u['username']) ?>"
+                     class="btn btn-sm btn-outline-secondary ms-1">
+                    <i class="bi bi-person-badge"></i>
+                  </a>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
