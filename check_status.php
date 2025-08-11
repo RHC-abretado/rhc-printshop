@@ -179,33 +179,34 @@ if (empty($_GET['captcha_answer']) || (int)$_GET['captcha_answer'] !== 1963) {
 
 try {
 
-// 5) Log the "check status" activity with IP, location, and user agent
-$username = $_SESSION['username'] ?? 'guest';
-$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-$ipAddress = getRealIpAddr();
-$location = getLocationFromIP($ipAddress);
-$details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+    // Gather request details for logging and mismatch reporting
+    $username  = $_SESSION['username'] ?? 'guest';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $ipAddress = getRealIpAddr();
+    $location  = getLocationFromIP($ipAddress);
+    $details   = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
 
-$log = $pdo->prepare(
-  "INSERT INTO activity_log (username, event, details)
-   VALUES (:u, 'check_status', :d)"
-);
-$log->execute([
-  ':u' => $username,
-  ':d' => $details
-]);
-
-    // 6) Fetch the ticket
-    $stmt = $pdo->prepare("
+    // Fetch the ticket
+    $stmt = $pdo->prepare(
+        "
       SELECT *
         FROM job_tickets
        WHERE ticket_number = :tn AND check_token = :token
        LIMIT 1
-    ");
+    "
+    );
     $stmt->execute([':tn' => $ticketNumber, ':token' => $token]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($ticket) {
+        // Log successful status check only after confirming the ticket exists
+        $log = $pdo->prepare(
+            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'check_status', :d)"
+        );
+        $log->execute([
+            ':u' => $username,
+            ':d' => $details
+        ]);
         ?>
         <div class="card">
           <div class="card-header">
@@ -226,18 +227,8 @@ $log->execute([
         </div>
         <?php
     } else {
-        $username = $_SESSION['username'] ?? 'guest';
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-        $ipAddress = getRealIpAddr();
-        $location = getLocationFromIP($ipAddress);
-        $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
-        $log = $pdo->prepare(
-            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'check_status_token_mismatch', :d)"
-        );
-        $log->execute([
-            ':u' => $username,
-            ':d' => $details
-        ]);
+        // Record mismatches separately to avoid polluting activity_log
+        error_log("check_status token mismatch for ticket {$ticketNumber} from IP {$ipAddress}");
         echo '<div class="alert alert-danger">Ticket not found.</div>';
     }
 
