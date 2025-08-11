@@ -285,12 +285,19 @@ setInterval(updateTicketBadges, 30000);
       <?php endif; ?>
     <?php endif; ?>
 
-    <!-- Always show Logout when logged in -->
-    <li class="nav-item">
-      <a href="logout.php" class="nav-link">
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
-      </a>
-    </li>
+      <?php if (!empty($_SESSION['original_user'])): ?>
+        <li class="nav-item">
+          <a href="stop_impersonate.php" class="nav-link text-warning">
+            <i class="bi bi-person-x" aria-hidden="true"></i> Stop Impersonating
+          </a>
+        </li>
+      <?php endif; ?>
+      <!-- Always show Logout when logged in -->
+      <li class="nav-item">
+        <a href="logout.php" class="nav-link">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
+        </a>
+      </li>
   <?php endif; ?>
 </ul>
 
@@ -370,6 +377,13 @@ setInterval(updateTicketBadges, 30000);
       <?php endif; ?>
     <?php endif; ?>
 
+    <?php if (!empty($_SESSION['original_user'])): ?>
+      <li class="nav-item">
+        <a href="stop_impersonate.php" class="nav-link text-warning">
+          <i class="bi bi-person-x" aria-hidden="true"></i> Stop Impersonating
+        </a>
+      </li>
+    <?php endif; ?>
     <!-- Always show Logout when logged in -->
     <li class="nav-item">
       <a href="logout.php" class="nav-link">
