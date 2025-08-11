@@ -53,6 +53,9 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'StaffUser') {
 }
 
 require 'header.php';
+
+// Purge legacy mismatch entries from the activity log
+$pdo->exec("DELETE FROM activity_log WHERE event IN ('status_token_mismatch','check_status_token_mismatch')");
 ?>
 
 <div class="container-fluid">
@@ -113,6 +116,9 @@ require 'header.php';
 // build dynamic WHERE clauses
 $conds  = [];
 $params = [];
+
+// always exclude mismatched status checks from results
+$conds[] = "event NOT IN ('status_token_mismatch','check_status_token_mismatch')";
 
 // user filter
 if (!empty($_GET['username_filter'])) {

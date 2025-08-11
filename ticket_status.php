@@ -116,21 +116,12 @@ if (empty($ticketNumber) || empty($token) || !preg_match('/^[a-f0-9]{32}$/', $to
 require_once 'header.php';
 // Process the ticket parameter
 try {
-    // Log the status check (use guest if not logged in) with IP, location, and user agent
-    $username = $_SESSION['username'] ?? 'guest';
+    // Gather request details for potential logging
+    $username  = $_SESSION['username'] ?? 'guest';
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
     $ipAddress = getRealIpAddr();
-    $location = getLocationFromIP($ipAddress);
-    $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
-
-    $log = $pdo->prepare(
-        "INSERT INTO activity_log (username, event, details)
-         VALUES (:u, 'check_status', :d)"
-    );
-    $log->execute([
-        ':u' => $username,
-        ':d' => $details
-    ]);
+    $location  = getLocationFromIP($ipAddress);
+    $details   = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
 
     // Fetch the ticket
     $stmt = $pdo->prepare("
@@ -142,22 +133,25 @@ try {
     $stmt->execute([':tn' => $ticketNumber, ':token' => $token]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$ticket) {
-        $error = 'Ticket not found.';
-        $details = "Ticket: {$ticketNumber}\nToken: {$token}\nIP: {$ipAddress}\nLocation: {$location}\nUser-Agent: {$userAgent}";
+    if ($ticket) {
+        // Log successful check after verifying ticket exists
         $log = $pdo->prepare(
-            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'status_token_mismatch', :d)"
+            "INSERT INTO activity_log (username, event, details) VALUES (:u, 'check_status', :d)"
         );
         $log->execute([
             ':u' => $username,
             ':d' => $details
         ]);
-    } else {
+
         if (!empty($ticket['email'])) {
             $etStmt = $pdo->prepare("SELECT token FROM requestor_token WHERE email = :email");
             $etStmt->execute([':email' => $ticket['email']]);
             $emailToken = $etStmt->fetchColumn() ?: '';
         }
+    } else {
+        $error = 'Ticket not found.';
+        // Record mismatches separately to avoid polluting activity_log
+        error_log("status.php token mismatch for ticket {$ticketNumber} from IP {$ipAddress}");
     }
 
 } catch (PDOException $e) {
