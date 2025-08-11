@@ -491,7 +491,7 @@ $html = "
         <div style='background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;'>
             <h3 style='margin-top: 0; color: #1976d2;'>Ticket Information</h3>
             <p><strong>Ticket Number:</strong> {$ticketData['ticket_number']}
-               <a href='https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}'
+               <a href='https://printing.riohondo.edu/ticket_status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}'
                   style='color: #1976d2;'>(check status)</a></p>
             <p><strong>Submitted:</strong> " . date('m/d/Y g:i A') . "</p>
         </div>
@@ -612,7 +612,7 @@ Your print request has been successfully submitted to RHC Printshop.
 
 TICKET INFORMATION:
 Ticket Number: {$ticketData['ticket_number']}
-Status Link: https://printing.riohondo.edu/status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}
+Status Link: https://printing.riohondo.edu/ticket_status.php?ticket={$ticketData['ticket_number']}&token={$ticketData['check_token']}
 History Link: {$historyUrl}
 Submitted: " . date('m/d/Y g:i A') . "
 
@@ -810,7 +810,7 @@ try {
 // on successful insert:
 $response['success']      = true;
 $response['ticketNumber'] = $ticketNumber;
-$statusUrl = 'status.php?ticket=' . $ticketNumber . '&token=' . $checkToken;
+$statusUrl = 'ticket_status.php?ticket=' . $ticketNumber . '&token=' . $checkToken;
 $response['message']      = 'Your order has been placed and Ticket number is #' . $ticketNumber . '. <br/>You can check the status at <a href="' . $statusUrl . '">' . $statusUrl . '</a>.<br/>Please keep this ticket number for your records. You will receive an email once your project is assigned and processing.';
 echo json_encode($response);
 exit;

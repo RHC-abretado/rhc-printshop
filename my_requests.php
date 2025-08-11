@@ -59,7 +59,7 @@ require_once 'header.php';
                             <td><?= htmlspecialchars($t['job_title']) ?></td>
                             <td><?= htmlspecialchars($t['assigned_to'] ?? '') ?></td>
                             <td><?php $n = $t['admin_notes'] ?? ''; echo htmlspecialchars(strlen($n) > 50 ? substr($n, 0, 50) . '...' : $n); ?></td>
-                            <td><a href="status.php?ticket=<?= urlencode($t['ticket_number']) ?>&token=<?= urlencode($t['check_token']) ?>">View</a></td>
+                            <td><a href="ticket_status.php?ticket=<?= urlencode($t['ticket_number']) ?>&token=<?= urlencode($t['check_token']) ?>">View</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
