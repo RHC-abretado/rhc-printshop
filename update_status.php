@@ -157,7 +157,7 @@ $log->execute([
                 );
             } else {
                 $assignedToName = htmlspecialchars(
-                    $ticket['assigned_to'],
+                    $ticket['assigned_to'] ?? '',
                     ENT_QUOTES, 'UTF-8'
                 );
             }
