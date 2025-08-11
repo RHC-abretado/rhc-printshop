@@ -49,7 +49,7 @@
       <li><strong>Enhanced Security &amp; Bot Protection:</strong> Added User-Agent tracking for all status checks, improved honeypot bot detection with detailed logging, and direct access protection for status pages with automatic redirection safeguards.</li>
       <li><strong>Hold Status &amp; Improved UI:</strong> Added new "Hold" ticket status with configurable email notifications, replaced multiple status buttons with streamlined dropdown menu, and enhanced visual status indicators across all system interfaces.</li>
       <li><strong>Advanced Cost Estimation:</strong> Fixed binding cost calculations to properly multiply by sets, improved NCR form pricing logic, enhanced cost breakdown display, and added estimated cost capture in form submissions.</li>
-      <li><strong>Standalone Status Page &amp; File Handling:</strong> Created dedicated `ticket_status.php` for direct URL access with clean email linking, increased file upload limit from 2 to 5 files maximum, and standardized date formatting across all system pages.</li>
+      <li><strong>Standalone Status Page &amp; File Handling:</strong> Created dedicated check status webpage for direct URL access with clean email linking, increased file upload limit from 2 to 5 files maximum, and standardized date formatting across all system pages.</li>
       <li><strong>Activity Log &amp; Export Enhancements:</strong> Added multi-line activity details formatting, filter result counters, new bot-related event types, Hold status integration in exports, and improved completion date filtering functionality.</li>
     </ul>
   </div>
