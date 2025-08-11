@@ -17,9 +17,11 @@ if (empty($_SESSION['form_token'])) {
 
 <h1>Submit a Print Request</h1>
 
-<div class="card" id="ticketForm">
-  <div class="card-header">Ticket Information</div>
-  <div class="card-body">
+  <div class="card" id="ticketForm">
+    <div class="card-header">Ticket Information
+      <button type="button" id="clearRequesterInfo" class="btn btn-sm btn-outline-secondary float-end">Clear saved info</button>
+    </div>
+    <div class="card-body">
     <form id="newTicketForm" method="post" action="submit_request.php" enctype="multipart/form-data" class="row g-3">
 
       <!-- NAME (First/Last) -->
@@ -402,6 +404,38 @@ document.addEventListener('DOMContentLoaded', function() {
   const bar     = document.getElementById('submitProgressBar');
   const msgDiv  = document.getElementById('formMessage');
   const card    = document.getElementById('ticketForm');
+  const clearBtn = document.getElementById('clearRequesterInfo');
+
+  // Populate form fields from saved info, if available
+  const savedInfo = localStorage.getItem('ticketRequesterInfo');
+  if (savedInfo) {
+    try {
+      const info = JSON.parse(savedInfo);
+      document.getElementById('first_name').value = info.first_name || '';
+      document.getElementById('last_name').value = info.last_name || '';
+      document.getElementById('department_name').value = info.department_name || '';
+      document.getElementById('email').value = info.email || '';
+      document.getElementById('phone').value = info.phone || '';
+      document.getElementById('location_code_select').value = info.location_code_select || '';
+      document.getElementById('other_location_code').value = info.other_location_code || '';
+      document.getElementById('location_code_select').dispatchEvent(new Event('change'));
+    } catch (e) {
+      // If parsing fails, remove the bad data
+      localStorage.removeItem('ticketRequesterInfo');
+    }
+  }
+
+  // Clear saved info handler
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      localStorage.removeItem('ticketRequesterInfo');
+      ['first_name','last_name','department_name','email','phone','location_code_select','other_location_code'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('location_code_select').dispatchEvent(new Event('change'));
+    });
+  }
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -411,6 +445,22 @@ document.addEventListener('DOMContentLoaded', function() {
     bar.style.width   = '0%';
     bar.textContent   = '0%';
     msgDiv.innerHTML  = '';
+
+    // Save requester info to localStorage
+    const requesterInfo = {
+      first_name: document.getElementById('first_name').value,
+      last_name: document.getElementById('last_name').value,
+      department_name: document.getElementById('department_name').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      location_code_select: document.getElementById('location_code_select').value,
+      other_location_code: document.getElementById('other_location_code').value
+    };
+    try {
+      localStorage.setItem('ticketRequesterInfo', JSON.stringify(requesterInfo));
+    } catch (e) {
+      // Ignore storage errors
+    }
 
     // build FormData (includes your hidden form_token)
     const data = new FormData(form);
