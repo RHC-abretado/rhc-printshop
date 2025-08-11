@@ -56,21 +56,24 @@ if (!isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
 }
 
 // Check if current remember_me token is still valid (for cross-device logout)
-if (isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
+if (isset($_SESSION['rememberme_cleared'])) {
+    // Skip token validation once if the cookie was recently cleared
+    unset($_SESSION['rememberme_cleared']);
+} elseif (isset($_SESSION['logged_in']) && isset($_COOKIE['rememberme'])) {
     try {
         $tokenCheck = $pdo->prepare("
-            SELECT COUNT(*) FROM user_remember_tokens 
+            SELECT COUNT(*) FROM user_remember_tokens
             WHERE token = :token AND expires_at > NOW()
         ");
         $tokenCheck->execute([':token' => $_COOKIE['rememberme']]);
         $tokenExists = $tokenCheck->fetchColumn();
-        
+
         // If token was deleted from another device, log out this session
         if (!$tokenExists) {
             $_SESSION = [];
             session_destroy();
             setcookie('rememberme','', time() - 3600, '/', '', true, true);
-            
+
             // Redirect to login with message
             if (!headers_sent()) {
                 header('Location: login.php?message=' . urlencode('You have been logged out from another device.'));

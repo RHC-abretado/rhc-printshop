@@ -104,7 +104,7 @@ if ($remember && strcasecmp($user['username'],'staffuser')!==0) {
     $expires = date('Y-m-d H:i:s', time() + 14*24*60*60); // 14 days
     $deviceInfo = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown Device';
     $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'Unknown IP';
-    
+
     // Insert new token with session ID
     $u = $pdo->prepare("
       INSERT INTO user_remember_tokens (user_id, token, expires_at, device_info, ip_address, last_used_at, session_id)
@@ -118,9 +118,15 @@ if ($remember && strcasecmp($user['username'],'staffuser')!==0) {
         ':ip_address' => $ipAddress,
         ':session_id' => session_id()  // Add this line
     ]);
-    
+
     setcookie('rememberme',$newToken,
               time()+14*24*60*60,'/','',true,true);
+} else {
+    // User opted out of remember-me: clear any existing cookie and tokens
+    setcookie('rememberme','', time()-3600, '/', '', true, true);
+    $del = $pdo->prepare("DELETE FROM user_remember_tokens WHERE user_id = :uid");
+    $del->execute([':uid' => $user['id']]);
+    $_SESSION['rememberme_cleared'] = true;
 }
 
                 header('Location: index.php');
