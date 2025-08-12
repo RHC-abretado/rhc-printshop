@@ -11,17 +11,6 @@ if (empty($_SESSION['original_user'])) {
     exit;
 }
 
-// Log out of the impersonated account
-$impersonated = $_SESSION['username'] ?? null;
-if ($impersonated) {
-    try {
-        $stmt = $pdo->prepare("INSERT INTO activity_log (username, event) VALUES (:u, 'logout')");
-        $stmt->execute([':u' => $impersonated]);
-    } catch (PDOException $e) {
-        // Ignore logging errors
-    }
-}
-
 // Restore original user credentials
 $_SESSION['username'] = $_SESSION['original_user']['username'];
 $_SESSION['role'] = $_SESSION['original_user']['role'];
