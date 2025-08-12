@@ -86,5 +86,6 @@ unset($row);
 
 echo json_encode([
     'tickets' => $rows,
-    'totalPages' => $totalPages
+    'totalPages' => $totalPages,
+    'total' => $total
 ]);
