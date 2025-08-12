@@ -58,6 +58,7 @@ require_once 'header.php';
           </thead>
           <tbody></tbody>
         </table>
+        <p id="ticketRange" class="text-muted"></p>
         <p id="noTickets" style="display:none;">No tickets found.</p>
         <nav>
           <ul class="pagination" id="paginationControls"></ul>
@@ -148,7 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const tbody        = document.querySelector('#ticketsTable tbody');
   const pagination   = document.getElementById('paginationControls');
   const noTickets    = document.getElementById('noTickets');
-  const pageSize     = 30;
+  const ticketRange  = document.getElementById('ticketRange');
+  const pageSize     = 25;
   let currentPage    = 1;
 
   function escapeHtml(text) {
@@ -211,8 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
         if (data.tickets.length === 0) {
           noTickets.style.display = 'block';
+          ticketRange.textContent = '';
         } else {
           noTickets.style.display = 'none';
+          const start = (page - 1) * pageSize + 1;
+          const end = Math.min(page * pageSize, data.total);
+          ticketRange.textContent = `Showing ${start}-${end} of ${data.total} tickets`;
           data.tickets.forEach(t => tbody.appendChild(buildRow(t)));
         }
         buildPagination(data.totalPages, page);
@@ -221,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(() => {
         tbody.innerHTML = '';
         noTickets.style.display = 'block';
+        ticketRange.textContent = '';
       });
   }
 
