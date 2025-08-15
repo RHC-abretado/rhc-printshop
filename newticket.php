@@ -206,6 +206,7 @@ try {
         <label for="page_type" class="form-label">Page Type / Weight</label>
         <select name="page_type" id="page_type" class="form-select">
           <option value="Standard 20#">Standard 20#</option>
+          <option value="24lb">24lb</option>
           <option value="Card Stock">Card Stock</option>
           <option value="NCR 2-Part">NCR 2-Part</option>
           <option value="NCR 3-Part">NCR 3-Part</option>
@@ -841,7 +842,29 @@ pageTypeSelect.addEventListener('change', function() {
     otherPageTypeContainer.style.display = 'none';
     document.getElementById('other_page_type').value = '';
   }
+
+  // Disable Legal and cardstock-only sizes when 24lb paper is selected
+  const paperSizeSelect = document.getElementById('paper_size_select');
+  const restrictedSizes = Array.from(paperSizeSelect.options).filter(opt =>
+    opt.value.includes('Legal') ||
+    opt.value.includes('12"x18"') ||
+    opt.value.includes('13"x19"')
+  );
+
+  if (this.value === '24lb') {
+    restrictedSizes.forEach(opt => {
+      opt.disabled = true;
+      if (opt.selected) {
+        paperSizeSelect.selectedIndex = 0;
+      }
+    });
+  } else {
+    restrictedSizes.forEach(opt => opt.disabled = false);
+  }
 });
+
+// Initialize state based on default selection
+pageTypeSelect.dispatchEvent(new Event('change'));
 
 // 4) Paper Color: show/hide Other Paper Color
 const paperColorSelect = document.getElementById('paper_color_select');
@@ -972,6 +995,8 @@ function calculateEstimate() {
     // Black & White pricing
     if (pageType === 'Card Stock') {
       baseCost = 0.25; // Cardstock 65lb - all sizes same price for B&W
+    } else if (pageType === '24lb') {
+      baseCost = paperSize.includes('Ledger') ? 0.50 : 0.25; // 24lb paper pricing
     } else if (paperSize.includes('Ledger')) {
       baseCost = 0.10; // Ledger (White)
     } else {
@@ -986,6 +1011,13 @@ function calculateEstimate() {
         baseCost = 0.50; // Cardstock Ledger
       } else {
         baseCost = 0.25; // Cardstock Letter/Legal
+      }
+    } else if (pageType === '24lb') {
+      // 24lb paper pricing for color
+      if (paperSize.includes('Ledger: 11"x17"')) {
+        baseCost = 0.50; // 24lb Color Ledger
+      } else {
+        baseCost = 0.25; // 24lb Color Letter/Legal
       }
     } else {
       // Standard paper for color
