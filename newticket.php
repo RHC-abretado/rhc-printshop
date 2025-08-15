@@ -842,7 +842,29 @@ pageTypeSelect.addEventListener('change', function() {
     otherPageTypeContainer.style.display = 'none';
     document.getElementById('other_page_type').value = '';
   }
+
+  // Disable Legal and cardstock-only sizes when 24lb paper is selected
+  const paperSizeSelect = document.getElementById('paper_size_select');
+  const restrictedSizes = Array.from(paperSizeSelect.options).filter(opt =>
+    opt.value.includes('Legal') ||
+    opt.value.includes('12"x18"') ||
+    opt.value.includes('13"x19"')
+  );
+
+  if (this.value === '24lb') {
+    restrictedSizes.forEach(opt => {
+      opt.disabled = true;
+      if (opt.selected) {
+        paperSizeSelect.selectedIndex = 0;
+      }
+    });
+  } else {
+    restrictedSizes.forEach(opt => opt.disabled = false);
+  }
 });
+
+// Initialize state based on default selection
+pageTypeSelect.dispatchEvent(new Event('change'));
 
 // 4) Paper Color: show/hide Other Paper Color
 const paperColorSelect = document.getElementById('paper_color_select');
