@@ -23,9 +23,9 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket'])) {
     $ticketId = (int)$_POST['delete_ticket'];
 
-    // 1) Fetch ticket_number + file paths + status
+    // 1) Fetch ticket_number + file paths
     $fetch = $pdo->prepare("
-      SELECT ticket_number, file_path, status
+      SELECT ticket_number, file_path
         FROM job_tickets
        WHERE id = :id
        LIMIT 1
@@ -33,46 +33,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket'])) {
     $fetch->execute([':id' => $ticketId]);
     $row = $fetch->fetch(PDO::FETCH_ASSOC);
 
-    if (!$row) {
-        $message = '<div class="alert alert-danger">Ticket not found.</div>';
-    } elseif ($row['status'] === 'Canceled') {
-        $message = '<div class="alert alert-danger">Cannot delete a canceled ticket.</div>';
-    } else {
-        // 2) Delete the record
-        $del = $pdo->prepare("DELETE FROM job_tickets WHERE id = :id");
-        $del->execute([':id' => $ticketId]);
+    // 2) Delete the record
+    $del = $pdo->prepare("DELETE FROM job_tickets WHERE id = :id");
+    $del->execute([':id' => $ticketId]);
 
-        if ($del->rowCount()) {
-            // 3) Remove uploaded files
-            if (!empty($row['file_path'])) {
-                $uploadDir = __DIR__ . '/uploads/';
-                foreach (explode(',', $row['file_path']) as $p) {
-                    $full = $uploadDir . basename(trim($p));
-                    if (file_exists($full)) {
-                        @unlink($full);
-                    }
+    if ($del->rowCount()) {
+        // 3) Remove uploaded files
+        if (!empty($row['file_path'])) {
+            $uploadDir = __DIR__ . '/uploads/';
+            foreach (explode(',', $row['file_path']) as $p) {
+                $full = $uploadDir . basename(trim($p));
+                if (file_exists($full)) {
+                    @unlink($full);
                 }
             }
-
-            // 4) Log the deletion in activity_log
-            $log = $pdo->prepare("
-              INSERT INTO activity_log (username, event, details)
-              VALUES (:u, 'delete_ticket', :d)
-            ");
-            $details = "Ticket #{$row['ticket_number']}";
-            $log->execute([
-              ':u' => $_SESSION['username'],
-              ':d' => $details,
-            ]);
-
-            $message = '<div class="alert alert-success">'
-                     . 'Ticket deleted successfully.'
-                     . '</div>';
-        } else {
-            $message = '<div class="alert alert-danger">'
-                     . 'Could not delete ticket (not found?).'
-                     . '</div>';
         }
+
+        // 4) Log the deletion in activity_log
+        $log = $pdo->prepare("
+          INSERT INTO activity_log (username, event, details)
+          VALUES (:u, 'delete_ticket', :d)
+        ");
+        $details = "Ticket #{$row['ticket_number']}";
+        $log->execute([
+          ':u' => $_SESSION['username'],
+          ':d' => $details,
+        ]);
+
+        $message = '<div class="alert alert-success">'
+                 . 'Ticket deleted successfully.'
+                 . '</div>';
+    } else {
+        $message = '<div class="alert alert-danger">'
+                 . 'Could not delete ticket (not found?).'
+                 . '</div>';
     }
 }
 
@@ -81,12 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_delete'], $_POST
     $ticketIds = array_map('intval', $_POST['ticket_ids']);
     $deletedCount = 0;
     $ticketNumbers = [];
-    $skippedIds = [];
 
     foreach ($ticketIds as $ticketId) {
-        // 1) Fetch ticket_number + file paths + status
+        // 1) Fetch ticket_number + file paths
         $fetch = $pdo->prepare("
-          SELECT ticket_number, file_path, status
+          SELECT ticket_number, file_path
             FROM job_tickets
            WHERE id = :id
            LIMIT 1
@@ -95,11 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_delete'], $_POST
         $row = $fetch->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) continue;
-
-        if ($row['status'] === 'Canceled') {
-            $skippedIds[] = $ticketId;
-            continue;
-        }
 
         // 2) Delete the record
         $del = $pdo->prepare("DELETE FROM job_tickets WHERE id = :id");
@@ -133,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_delete'], $_POST
           ':u' => $_SESSION['username'],
           ':d' => $details,
         ]);
+
         $message = '<div class="alert alert-success">'
                  . 'Successfully deleted ' . $deletedCount . ' tickets.'
                  . '</div>';
@@ -140,10 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_delete'], $_POST
         $message = '<div class="alert alert-danger">'
                  . 'No tickets were deleted.'
                  . '</div>';
-    }
-
-    if (!empty($skippedIds)) {
-        $message .= '<div class="alert alert-warning">Skipped ID(s): ' . implode(', ', $skippedIds) . ' (Canceled).</div>';
     }
 }
 

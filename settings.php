@@ -56,40 +56,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([':tn' => $delTicketNumber]);
             $delTicket = $stmt->fetch(PDO::FETCH_ASSOC);
         } else {
-            // grab file paths and status
-            $stmt = $pdo->prepare("SELECT file_path, status FROM job_tickets WHERE ticket_number = :tn LIMIT 1");
+            // grab file paths
+            $stmt = $pdo->prepare("SELECT file_path FROM job_tickets WHERE ticket_number = :tn LIMIT 1");
             $stmt->execute([':tn' => $delTicketNumber]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$row) {
-                $deleteMessage = '<div class="alert alert-danger">Ticket not found.</div>';
-            } elseif ($row['status'] === 'Canceled') {
-                $deleteMessage = '<div class="alert alert-danger">Cannot delete a ticket with status Canceled.</div>';
-                // re-fetch full ticket to re-display details
-                $stmt       = $pdo->prepare("SELECT * FROM job_tickets WHERE ticket_number = :tn LIMIT 1");
-                $stmt->execute([':tn' => $delTicketNumber]);
-                $delTicket = $stmt->fetch(PDO::FETCH_ASSOC);
-            } else {
-                // delete row
-                $delStmt = $pdo->prepare("DELETE FROM job_tickets WHERE ticket_number = :tn");
-                $delStmt->execute([':tn' => $delTicketNumber]);
-                // remove uploads
-                if (!empty($row['file_path'])) {
-                    $uploadDir = __DIR__ . '/uploads/';
-                    foreach (explode(',', $row['file_path']) as $p) {
-                        $p = trim($p);
-                        $full = $uploadDir . basename($p);
-                        if (file_exists($full)) {
-                            unlink($full);
-                        }
+            // delete row
+            $delStmt = $pdo->prepare("DELETE FROM job_tickets WHERE ticket_number = :tn");
+            $delStmt->execute([':tn' => $delTicketNumber]);
+            // remove uploads
+            if (!empty($row['file_path'])) {
+                $uploadDir = __DIR__ . '/uploads/';
+                foreach (explode(',', $row['file_path']) as $p) {
+                    $p = trim($p);
+                    $full = $uploadDir . basename($p);
+                    if (file_exists($full)) {
+                        unlink($full);
                     }
                 }
-                $deleteMessage = '<div class="alert alert-success">'
-                               . "Ticket #".htmlspecialchars($delTicketNumber)." deleted successfully."
-                               . '</div>';
-                $delTicket = null;
-                $delTicketNumber = '';
             }
+            $deleteMessage = '<div class="alert alert-success">'
+                           . "Ticket #".htmlspecialchars($delTicketNumber)." deleted successfully."
+                           . '</div>';
+            $delTicket = null;
+            $delTicketNumber = '';
         }
     }
 }
