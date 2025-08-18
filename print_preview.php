@@ -32,7 +32,7 @@ if (!$ticket) {
 }
 
 $reqDate  = toLA($ticket['created_at'],  'm/d/Y');
-$dueDate  = toLA($ticket['date_wanted'], 'm/d/Y');
+$dueDate  = date('m/d/Y', strtotime($ticket['date_wanted']));
 $compDate = !empty($ticket['completed_at'])
           ? toLA($ticket['completed_at'], 'm/d/Y H:i:s')
           : null;
