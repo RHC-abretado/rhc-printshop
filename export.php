@@ -64,7 +64,7 @@ if ($action === 'Export CSV') {
 
     // CSV header row
     fputcsv($out, [
-        'ticket_number','ticket_status','created_at','date_wanted',
+        'ticket_number','ticket_status','created_at','completed_at','date_wanted',
         'first_name','last_name','department_name','email','phone',
         'location_code','other_location_code','delivery_method',
         'job_title','description','pages_in_original','assigned_to',
@@ -80,8 +80,9 @@ if ($action === 'Export CSV') {
     $domain = $_SERVER['HTTP_HOST'];
 
     foreach ($tickets as $row) {
-        $created = toLA($row['created_at'], 'm-d-Y H:i:s');
-    $wanted  = date('m-d-Y', strtotime($row['date_wanted']));
+        $created    = toLA($row['created_at'], 'm-d-Y H:i:s');
+        $completed  = !empty($row['completed_at']) ? toLA($row['completed_at'], 'm-d-Y H:i:s') : '';
+        $wanted     = date('m-d-Y', strtotime($row['date_wanted']));
         $uploaded = [];
         if (!empty($row['file_path'])) {
             foreach (explode(',', $row['file_path']) as $p) {
@@ -97,6 +98,7 @@ if ($action === 'Export CSV') {
             $row['ticket_number'],
             $row['ticket_status'],
             $created,
+            $completed,
             $wanted,
             $row['first_name'],
             $row['last_name'],
@@ -196,6 +198,7 @@ require_once 'header.php';
               <th>Ticket #</th>
               <th>Status</th>
               <th>Created At</th>
+              <th>Completion Date</th>
               <th>Due Date</th>
               <th>First Name</th>
               <th>Last Name</th>
@@ -210,6 +213,7 @@ require_once 'header.php';
   <td><?=htmlspecialchars($r['ticket_number'] ?? '')?></td>
   <td><?=htmlspecialchars($r['ticket_status'] ?? '')?></td>
   <td><?= htmlspecialchars(toLA($r['created_at'], 'm-d-Y H:i:s')) ?></td>
+  <td><?= htmlspecialchars(!empty($r['completed_at']) ? toLA($r['completed_at'], 'm-d-Y H:i:s') : '') ?></td>
   <td><?= htmlspecialchars(date('m-d-Y', strtotime($r['date_wanted']))) ?></td>
   <td><?=htmlspecialchars($r['first_name'] ?? '')?></td>
   <td><?=htmlspecialchars($r['last_name'] ?? '')?></td>
